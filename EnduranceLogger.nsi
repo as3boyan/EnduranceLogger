@@ -209,6 +209,7 @@ Section Uninstall
   Delete "$INSTDIR\assets\sounds\awesome1.mp3"
   Delete "$INSTDIR\assets\openfl.svg"
   Delete "$INSTDIR\application.xml"
+  Delete "$INSTDIR\workout.db"
 
   Delete "$SMPROGRAMS\Endurance Logger\Uninstall.lnk"
   Delete "$SMPROGRAMS\Endurance Logger\Website.lnk"
@@ -222,6 +223,9 @@ Section Uninstall
   RMDir "$INSTDIR\bin\windows\neko\haxe"
   RMDir "$INSTDIR\bin\windows\neko\bin\sounds"
   RMDir "$INSTDIR\bin\windows\neko\bin"
+  RMDir "$INSTDIR\bin\windows\neko"
+  RMDir "$INSTDIR\bin\windows"
+  RMDir "$INSTDIR\bin"
   RMDir "$INSTDIR\assets\sounds"
   RMDir "$INSTDIR\assets"
   RMDir "$INSTDIR"
