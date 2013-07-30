@@ -120,6 +120,7 @@ class InputField extends Sprite
 				timer.run = function ():Void
 				{
 					Assets.getSound("sounds/newdailyrecord.mp3").play();
+					timer.stop();
 				}
 			}
 			
@@ -147,6 +148,7 @@ class InputField extends Sprite
 				timer.run = function ():Void
 				{
 					Assets.getSound("sounds/newmonthrecord.mp3").play();
+					timer.stop();
 				}
 			}
 			
