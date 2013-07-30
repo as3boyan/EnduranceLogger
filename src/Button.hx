@@ -1,5 +1,5 @@
 /*
- * Endurance Logger, program that is intended to help your to track your fitness progress
+ * Endurance Logger, program that is intended to help you to track your fitness progress
  * Copyright (C) 2013 AS3Boyan
  * 
  * This file is part of Endurance Logger.
