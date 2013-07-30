@@ -1,7 +1,7 @@
 EnduranceLogger
 ===============
 
-Program that is intended to help your to track your fitness progress
+Program that is intended to help you to track your fitness progress
 
 
 ### Binary
