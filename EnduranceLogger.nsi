@@ -26,7 +26,7 @@
 ; Instfiles page
 !insertmacro MUI_PAGE_INSTFILES
 ; Finish page
-!define MUI_FINISHPAGE_RUN "$INSTDIR\EnduranceLogger.exe"
+; !define MUI_FINISHPAGE_RUN "$INSTDIR\EnduranceLogger.exe"
 !insertmacro MUI_PAGE_FINISH
 
 ; Uninstaller pages
@@ -78,7 +78,6 @@ Section "MainSection" SEC01
   File "zlib.dll"
   File "COPYING"
   File "EnduranceLogger.hxproj"
-  File "openfl-readme.txt"
   SetOutPath "$INSTDIR\src"
   File "src\Button.hx"
   File "src\ColoredPoint.hx"
@@ -138,7 +137,6 @@ Section Uninstall
   Delete "$INSTDIR\src\ColoredPointsManager.hx"
   Delete "$INSTDIR\src\ColoredPoint.hx"
   Delete "$INSTDIR\src\Button.hx"
-  Delete "$INSTDIR\openfl-readme.txt"
   Delete "$INSTDIR\EnduranceLogger.hxproj"
   Delete "$INSTDIR\COPYING"
   Delete "$INSTDIR\zlib.dll"
@@ -170,9 +168,9 @@ Section Uninstall
   Delete "$DESKTOP\Endurance Logger.lnk"
   Delete "$SMPROGRAMS\Endurance Logger\Endurance Logger.lnk"
 
-  RMDir "$SMPROGRAMS\Endurance Logger"
   RMDir "$INSTDIR\src"
   RMDir "$INSTDIR\sounds"
+  RMDir "$SMPROGRAMS\Endurance Logger"
   RMDir "$INSTDIR"
 
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
