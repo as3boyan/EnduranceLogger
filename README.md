@@ -9,6 +9,13 @@ Endurance Logger 1.0 Beta(Windows binary + source):
 https://dl.dropboxusercontent.com/u/107033883/EnduranceLogger.exe
 
 
+### Build from source
+
+You can build it using FlashDevelop(Neko target).
+
+Dependencies:
+You will need msvcr71.dll file, which you can find in binary distribution. It needs to be located in same folder with exe.
+
 Made using Haxe/OpenFL.
 
 Licensed under GPL v3 license.
