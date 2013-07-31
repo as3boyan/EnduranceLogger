@@ -66,7 +66,7 @@ Section "MainSection" SEC01
   File "assets\img\twitter-bird-16x16.png"
   File "assets\img\gplus-16.png"
   SetOutPath "$INSTDIR"
-  File "EnduranceLogger.exe"
+  File "bin\windows\neko\bin\EnduranceLogger.exe"
   CreateDirectory "$SMPROGRAMS\Endurance Logger"
   CreateShortCut "$SMPROGRAMS\Endurance Logger\Endurance Logger.lnk" "$INSTDIR\EnduranceLogger.exe"
   CreateShortCut "$DESKTOP\Endurance Logger.lnk" "$INSTDIR\EnduranceLogger.exe"
@@ -175,6 +175,7 @@ Section Uninstall
 
   RMDir "$INSTDIR\src"
   RMDir "$INSTDIR\sounds"
+  RMDir "$INSTDIR\img"
   RMDir "$SMPROGRAMS\Endurance Logger"
   RMDir "$INSTDIR"
 
