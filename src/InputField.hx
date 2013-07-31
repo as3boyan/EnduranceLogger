@@ -116,42 +116,52 @@ class InputField extends Sprite
 			{
 				GV.showText("Congratulations! You have set new daily record for " + GV.exercise_text[GV.exercise_type-1].toLowerCase() + "(" + Std.string(day_record.record)  + ")", 5000);
 				
-				var timer:Timer = new Timer(1500);
-				timer.run = function ():Void
+				if (GV.sound_on)
 				{
-					Assets.getSound("sounds/newdailyrecord.mp3").play();
-					timer.stop();
+					var timer:Timer = new Timer(1500);
+					timer.run = function ():Void
+					{
+						Assets.getSound("sounds/newdailyrecord.mp3").play();
+						timer.stop();
+					}
 				}
 			}
 			
-			var month_record = WorkoutData.getMonthRecord();
-			var month_date:Date = Date.fromString(month_record.date);
-			
-			if (month_date.getMonth() != current_date.getMonth() && month_date.getFullYear() != current_date.getFullYear())
+			if (WorkoutData.checkMonthCount() > 1)
 			{
-				var date2:Date = new Date(current_date.getFullYear(), current_date.getMonth(), 1, 0, 0, 0);
-				var date3:Date = DateTools.delta(date2, DateTools.days(DateTools.getMonthDays(date2)));
+				var month_record = WorkoutData.getMonthRecord();
+				var month_date:Date = Date.fromString(month_record.date);
 				
-				var sum:Int = WorkoutData.getSumBetweenDate(date2, date3);
-				var diff:Int = month_record.record - sum;
-				
-				if (diff > 0)
+				if (month_date.getMonth() != current_date.getMonth() && month_date.getFullYear() != current_date.getFullYear())
 				{
-					GV.showText("Do" + Std.string(diff) + " additional " + GV.exercise_text[GV.exercise_type-1].toLowerCase() + " to break month record(" + Std.string(month_record.record) + " on " +  DateTools.format(cast(month_record.date, Date), "%Y-%m") + ")", 10000);
+					var date2:Date = new Date(current_date.getFullYear(), current_date.getMonth(), 1, 0, 0, 0);
+					var date3:Date = DateTools.delta(date2, DateTools.days(DateTools.getMonthDays(date2)));
+					
+					var sum:Int = WorkoutData.getSumBetweenDate(date2, date3);
+					var diff:Int = month_record.record - sum;
+					
+					if (diff > 0)
+					{
+						GV.showText("Do" + Std.string(diff) + " additional " + GV.exercise_text[GV.exercise_type-1].toLowerCase() + " to break month record(" + Std.string(month_record.record) + " on " +  DateTools.format(cast(month_record.date, Date), "%Y-%m") + ")", 10000);
+					}
+				}
+				else
+				{
+					GV.showText("Congratulations! You have set new month record for " + GV.exercise_text[GV.exercise_type-1].toLowerCase() + "(" + Std.string(month_record.record)  + ")", 5000);
+					
+					if (GV.sound_on)
+					{
+						var timer:Timer = new Timer(3000);
+						timer.run = function ():Void
+						{
+							Assets.getSound("sounds/newmonthrecord.mp3").play();
+							timer.stop();
+						}
+					}
+					
 				}
 			}
-			else
-			{
-				GV.showText("Congratulations! You have set new month record for " + GV.exercise_text[GV.exercise_type-1].toLowerCase() + "(" + Std.string(month_record.record)  + ")", 5000);
 				
-				var timer:Timer = new Timer(3000);
-				timer.run = function ():Void
-				{
-					Assets.getSound("sounds/newmonthrecord.mp3").play();
-					timer.stop();
-				}
-			}
-			
 			GV.time_range = prev_time_range;
 			GV.exercise_type = prev_exercise_type;
 			
@@ -168,7 +178,7 @@ class InputField extends Sprite
 			
 			if (GV.exercise_type == exercise_type) GV.updateData();
 			
-			Assets.getSound(sound_type).play();
+			if (GV.sound_on) Assets.getSound(sound_type).play();
 		}
 		else
 		{

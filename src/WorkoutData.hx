@@ -26,10 +26,14 @@ class WorkoutData
 {
 	static private var cnx;
 	static private var week_days:Array<String>;
+	static private var month_text:Array<String>;
 	
 	static public function init() 
 	{
-		cnx = Sqlite.open("workout.db");
+		var executable_path:String = Sys.executablePath();
+		executable_path = executable_path.substring(0, executable_path.lastIndexOf("\\")) + "\\";
+
+		cnx = Sqlite.open(executable_path + "workout.db");
 		sys.db.Manager.cnx = cnx;
 		sys.db.Manager.initialize();
 		
@@ -46,6 +50,20 @@ class WorkoutData
 		week_days.push("Friday");
 		week_days.push("Saturday");
 		week_days.push("Sunday");
+		
+		month_text = new Array();
+		month_text.push("January");
+		month_text.push("February");
+		month_text.push("March");
+		month_text.push("April");
+		month_text.push("May");
+		month_text.push("June");
+		month_text.push("July");
+		month_text.push("August");
+		month_text.push("September");
+		month_text.push("October");
+		month_text.push("November");
+		month_text.push("December");	
 	}
 	
 	static public function close()
@@ -346,7 +364,7 @@ class WorkoutData
 		for ( workout_stats in WorkoutStats.manager.search($date >= date1 && $date < date2 && $exercise_type == GV.exercise_type))
 		{
 			var date:Date = Date.fromString(workout_stats.date.toString());
-			var date_string:String = null;
+			var date_string:String = null;	
 			
 			switch (GV.time_range)
 			{
@@ -356,7 +374,7 @@ class WorkoutData
 				case 2:
 					date_string = week_days[Std.int(getWeekDay(date))];
 				case 3: 
-					date_string = Std.string(date.getDate());
+					date_string = month_text[date.getMonth()] + " " + Std.string(date.getDate());
 				case _:
 					date_string = date.toString();
 				
@@ -424,16 +442,37 @@ class WorkoutData
 		return array;
 	}
 	
+	static public function checkMonthCount():Int
+	{
+		var month_count:Int = 0;
+		
+		var first_workout_date:Date = getFirstWorkoutDate();
+		
+		if (first_workout_date != null)
+		{
+			var current_date:Date = Date.now();
+			
+			for (i in first_workout_date.getFullYear()...current_date.getFullYear()+1)
+			{
+				for (j in 0...12)
+				{
+					var date2:Date = new Date(i, j, 1, 0, 0, 0);
+					var date3:Date = DateTools.delta(date2, DateTools.days(DateTools.getMonthDays(date2)));
+					
+					var workout_stats_array:List<WorkoutStats> = WorkoutStats.manager.search($date >= date2 && $date < date3 && $exercise_type == GV.exercise_type);
+					if (workout_stats_array.length > 0) month_count++;
+				}
+			}
+		}
+		
+		return month_count;
+	}
+	
 	static public function getAllTimeStats():Array<WorkoutInfo>
 	{
 		var array:Array<WorkoutInfo> = new Array();
 		
-		var first_workout_date:Date = null;
-		
-		for (workout_stats in WorkoutStats.manager.search(true, { limit:1 } ))
-		{
-			first_workout_date = Date.fromString(workout_stats.date.toString());
-		}
+		var first_workout_date:Date = getFirstWorkoutDate();
 		
 		if (first_workout_date != null)
 		{

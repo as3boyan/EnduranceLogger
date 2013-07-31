@@ -280,6 +280,8 @@ class Main extends Sprite
 		GV.updateData = updateData;
 		GV.updateData();
 		
+		GV.sound_on = true;
+		
 		addEventListener(Event.ACTIVATE, onActivate );
 		addEventListener(Event.DEACTIVATE, onDeactivate );
 		stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
@@ -340,6 +342,19 @@ class Main extends Sprite
 				if (input_field.visible && input_field.mouseEnabled)
 				{
 					input_field.hide();
+				}
+			case Keyboard.M:
+				{
+					GV.sound_on = !GV.sound_on;
+					
+					if (GV.sound_on)
+					{
+						info_panel.show("Sound is turned on");
+					}
+					else
+					{
+						info_panel.show("Sound is turned off");
+					}
 				}
 		}
 	}

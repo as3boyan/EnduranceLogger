@@ -85,7 +85,7 @@ class ColoredPoint extends Sprite
 	
 	public function setText(_string:String, _value:Int)
 	{
-		tf.text = Std.string(_value) + "\n" + _string;
+		tf.text = Std.string(_value) + " " + GV.exercise_text[GV.exercise_type-1].toLowerCase() + "\n" + _string;
 	}
 	
 }

@@ -27,6 +27,7 @@ class GV
 	public static var exercise_text:Array<String>;
 	public static var time_range:Int;
 	public static var showText:Dynamic;
+	public static var sound_on:Bool;
 	
 	public function new() 
 	{
