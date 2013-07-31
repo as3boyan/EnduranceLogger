@@ -19,11 +19,14 @@
 
 package ;
 
+import fileutils.TextFileUtils;
+import flash.display.Bitmap;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
 import flash.Lib;
+import flash.net.URLRequest;
 import flash.text.TextField;
 import flash.text.TextFieldAutoSize;
 import flash.text.TextFieldType;
@@ -63,6 +66,8 @@ class Main extends Sprite
 	var max:Float;
 	var previous_layers:Array<Sprite>;
 	var info_panel:InfoPanel;
+	var twitter_image:SocialButton;
+	var googleplus_image:SocialButton;
 	
 	/* ENTRY POINT */
 	
@@ -133,13 +138,21 @@ class Main extends Sprite
 		
 		for (i in 0...5)
 		{
-			var time_range_button:Button = new Button(this, i * 75 + stage.stageWidth - 5*75 + 15, 20, time_range_text[i]);
+			var time_range_button:Button = new Button(this, i * 75 + stage.stageWidth - 5*75 + 15 - 80, 20, time_range_text[i]);
 			time_range_button.setWidth(75, 25, 0xF8F8F8);
 			time_range_button.time_range = i + 1;
 			time_range_buttons.push(time_range_button);
 		}
-		
+						
 		setChildIndex(time_range_buttons[0], numChildren - 1);
+		
+		twitter_image = new SocialButton("img/twitter-bird-16x16.png", "http://twitter.com/share?url=https://github.com/as3boyan/EnduranceLogger&text=I just got an open source Endurance Logger(fitness tracker) by @AS3Boyan It rocks! Get fit!");
+		twitter_image.setPos(time_range_buttons[time_range_buttons.length - 1].x + 75 + 15 - 3 , time_range_buttons[time_range_buttons.length - 1].y + 5);
+		background.addChild(twitter_image);
+		
+		googleplus_image = new SocialButton("img/gplus-16.png", "https://plus.google.com/share?url=https://github.com/as3boyan/EnduranceLogger&hl=en-US");
+		googleplus_image.setPos(time_range_buttons[time_range_buttons.length - 1].x + 75 + 15 + 35 - 3, time_range_buttons[time_range_buttons.length - 1].y + 5);
+		background.addChild(googleplus_image);
 		
 		var text_format:TextFormat = new TextFormat();
 		text_format.font = "Arial";
@@ -281,11 +294,32 @@ class Main extends Sprite
 		GV.updateData();
 		
 		GV.sound_on = true;
+		GV.social_buttons_on = true;
+		
+		var settings:String = TextFileUtils.readTextFile(Utils.getExecutablePath() + "settings.cfg");
+		
+		if (settings != "")
+		{
+			var array:Array<String> = settings.split("|");
+			
+			if (array.length > 1)
+			{
+				if (array[0] == "0")
+				{
+					GV.sound_on = false;
+				}
+				
+				if (array[1] == "0")
+				{
+					toggleSocialButtons(false);
+				}
+			}
+		}
 		
 		addEventListener(Event.ACTIVATE, onActivate );
 		addEventListener(Event.DEACTIVATE, onDeactivate );
 		stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
-		
+						
 		//trace(WorkoutData.getAllRecords());
 	}
 	
@@ -344,18 +378,68 @@ class Main extends Sprite
 					input_field.hide();
 				}
 			case Keyboard.M:
+				GV.sound_on = !GV.sound_on;
+				
+				if (GV.sound_on)
 				{
-					GV.sound_on = !GV.sound_on;
-					
-					if (GV.sound_on)
-					{
-						info_panel.show("Sound is turned on");
-					}
-					else
-					{
-						info_panel.show("Sound is turned off");
-					}
+					info_panel.show("Sound is turned on");
 				}
+				else
+				{
+					info_panel.show("Sound is turned off");
+				}
+				
+				saveSettings();
+			case Keyboard.T:
+				toggleSocialButtons();
+				saveSettings();
+		}
+	}
+	
+	private function saveSettings():Void
+	{
+		var str:String = "";
+		
+		if (GV.sound_on)
+		{
+			str += "1|";
+		}
+		else
+		{
+			str += "0|";
+		}
+		
+		if (GV.social_buttons_on)
+		{
+			str += "1";
+		}
+		else
+		{
+			str += "0";
+		}
+		
+		TextFileUtils.updateTextFile(Utils.getExecutablePath() + "settings.cfg", str);
+	}
+	
+	private function toggleSocialButtons(?animated:Bool = true):Void
+	{
+		GV.social_buttons_on = !GV.social_buttons_on;
+		twitter_image.visible = GV.social_buttons_on;
+		googleplus_image.visible = GV.social_buttons_on;
+		
+		if (twitter_image.visible == true)
+		{
+			for (i in 0...time_range_buttons.length)
+			{
+				time_range_buttons[i].setPos(i * 75 + stage.stageWidth - 5 * 75 + 15 - 80, 20, animated);
+			}
+		}
+		else
+		{
+			for (i in 0...time_range_buttons.length)
+			{
+				time_range_buttons[i].setPos(i * 75 + stage.stageWidth - 5 * 75 + 15, 20, animated);
+			}
 		}
 	}
 	

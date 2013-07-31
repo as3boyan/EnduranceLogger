@@ -18,21 +18,39 @@
 */
 
 package ;
+import flash.display.Bitmap;
+import flash.display.Sprite;
+import flash.events.MouseEvent;
+import flash.Lib;
+import flash.net.URLRequest;
+import openfl.Assets;
 
-class GV
+class SocialButton extends Scalable
 {
-	public static var exercise_type:Int;
-	public static var updateData:Dynamic;
-	public static var colors:Array<Int>;
-	public static var exercise_text:Array<String>;
-	public static var time_range:Int;
-	public static var showText:Dynamic;
-	public static var sound_on:Bool;
-	public static var social_buttons_on:Bool;
+	var url:String;
 	
-	public function new() 
+	public function new(_image_path:String, _url:String) 
 	{
+		super();
 		
+		url = _url;
+		
+		addChild(new Bitmap(Assets.getBitmapData(_image_path)));
+		addEventListener(MouseEvent.CLICK, onClick);
+	}
+	
+	public function setPos(_x:Float, _y:Float) 
+	{
+		x = _x;
+		y = _y;
+		
+		start_x = _x;
+		start_y = _y;
+	}
+	
+	private function onClick(e:MouseEvent):Void 
+	{
+		Lib.getURL(new URLRequest(url));
 	}
 	
 }

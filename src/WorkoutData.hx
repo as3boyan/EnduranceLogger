@@ -30,10 +30,7 @@ class WorkoutData
 	
 	static public function init() 
 	{
-		var executable_path:String = Sys.executablePath();
-		executable_path = executable_path.substring(0, executable_path.lastIndexOf("\\")) + "\\";
-
-		cnx = Sqlite.open(executable_path + "workout.db");
+		cnx = Sqlite.open(Utils.getExecutablePath() + "workout.db");
 		sys.db.Manager.cnx = cnx;
 		sys.db.Manager.initialize();
 		

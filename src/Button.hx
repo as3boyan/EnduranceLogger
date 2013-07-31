@@ -72,8 +72,7 @@ class Button extends Sprite
 		addEventListener(MouseEvent.MOUSE_OUT, onMouseOut);
 		addEventListener(MouseEvent.MOUSE_OVER, onMouseOver);
 		
-		pos_x = _x;
-		pos_y = _y;
+		setPos(_x, _y);
 				
 		_parent.addChild(this);
 		
@@ -102,6 +101,25 @@ class Button extends Sprite
 		}
 	}
 	
+	public function setPos(_x:Float, _y:Float, ?animated:Bool = false):Void
+	{
+		pos_x = _x;
+		pos_y = _y;
+		
+		start_x = pos_x - width / 2;
+		start_y = pos_y - height / 2 ;
+		
+		if (!animated)
+		{
+			x = start_x;
+			y = start_y;
+		}
+		else
+		{
+			Actuate.tween(this, 1, { x:start_x, y:start_y } );
+		}
+	}
+	
 	private function onClick(e:MouseEvent):Void 
 	{
 		if (on_click != null) on_click();
@@ -114,11 +132,7 @@ class Button extends Sprite
 		tf.height = background.height;
 		tf.y = (tf.height - tf.textHeight) / 2;
 		
-		x = pos_x - width / 2;
-		y = pos_y - height / 2;
-		
-		start_x = x;
-		start_y = y;
+		setPos(pos_x, pos_y);
 		
 		selection = new Sprite();
 		selection.graphics.lineStyle(_selection_thickness, 0x000000, 0.3);

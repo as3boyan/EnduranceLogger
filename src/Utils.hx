@@ -70,4 +70,11 @@ class Utils
 		return combineRGB(r,g,b);
 	}
 	
+	static public function getExecutablePath():String
+	{
+		var executable_path:String = Sys.executablePath();
+		executable_path = executable_path.substring(0, executable_path.lastIndexOf("\\")) + "\\";
+		return executable_path;
+	}
+	
 }

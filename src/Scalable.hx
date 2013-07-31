@@ -18,21 +18,31 @@
 */
 
 package ;
+import flash.display.Sprite;
+import flash.events.MouseEvent;
+import motion.Actuate;
 
-class GV
+class Scalable extends Sprite
 {
-	public static var exercise_type:Int;
-	public static var updateData:Dynamic;
-	public static var colors:Array<Int>;
-	public static var exercise_text:Array<String>;
-	public static var time_range:Int;
-	public static var showText:Dynamic;
-	public static var sound_on:Bool;
-	public static var social_buttons_on:Bool;
+	var start_x:Float;
+	var start_y:Float;
 	
 	public function new() 
 	{
+		super();
 		
+		addEventListener(MouseEvent.MOUSE_OUT, onMouseOut);
+		addEventListener(MouseEvent.MOUSE_OVER, onMouseOver);
+	}
+	
+	private function onMouseOut(e:MouseEvent):Void 
+	{
+		Actuate.tween(this, 1, { x:start_x, y:start_y, scaleX:1, scaleY:1 }, false );
+	}
+	
+	private function onMouseOver(e:MouseEvent):Void 
+	{		
+		Actuate.tween(this, 1, { x:start_x - width * 0.1, y:start_y - height * 0.1, scaleX:1.2, scaleY:1.2 }, false );
 	}
 	
 }
