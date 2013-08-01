@@ -25,7 +25,10 @@ import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
+import flash.events.ProgressEvent;
 import flash.Lib;
+import flash.net.URLLoader;
+import flash.net.URLLoaderDataFormat;
 import flash.net.URLRequest;
 import flash.text.TextField;
 import flash.text.TextFieldAutoSize;
@@ -36,11 +39,14 @@ import flash.ui.Keyboard;
 import flash.Vector.Vector;
 import flash.Vector.Vector;
 import flash.Vector.Vector;
+import haxe.crypto.Crc32;
 import motion.Actuate;
 import motion.easing.Cubic;
 import motion.easing.Linear;
 import openfl.Assets;
 import openfl.display.FPS;
+import sys.io.File;
+import sys.io.Process;
 
 class Main extends Sprite 
 {
@@ -68,6 +74,14 @@ class Main extends Sprite
 	var info_panel:InfoPanel;
 	var twitter_image:SocialButton;
 	var googleplus_image:SocialButton;
+	var check_update_date:Date;
+	var url_loader:URLLoader;
+	var url_loader2:URLLoader;
+	var url_loader3:URLLoader;
+	var dropbox_url:String;
+	var download_dialog:DownloadDialog;
+	var crc:Int;
+	var progress_bar:ProgressBar;
 	
 	/* ENTRY POINT */
 	
@@ -298,6 +312,23 @@ class Main extends Sprite
 		GV.sound_on = true;
 		GV.social_buttons_on = true;
 		
+		dropbox_url = "https://dl.dropboxusercontent.com/u/107033883/";
+		
+		url_loader = new URLLoader();
+		url_loader.dataFormat = URLLoaderDataFormat.TEXT;
+		url_loader.addEventListener(Event.COMPLETE, onDownloadComplete);
+		
+		url_loader2 = new URLLoader();
+		url_loader2.dataFormat = URLLoaderDataFormat.TEXT;
+		url_loader2.addEventListener(Event.COMPLETE, onDownloadChangeLogComplete);
+		
+		url_loader3 = new URLLoader();
+		url_loader3.dataFormat = URLLoaderDataFormat.BINARY;
+		url_loader3.addEventListener(ProgressEvent.PROGRESS, onDownloadProgress);
+		url_loader3.addEventListener(Event.COMPLETE, onDownloadSetupComplete);
+		
+		GV.startDownload = startDownload;
+		
 		var settings:String = TextFileUtils.readTextFile(Utils.getExecutablePath() + "settings.cfg");
 		
 		if (settings != "")
@@ -316,13 +347,107 @@ class Main extends Sprite
 					toggleSocialButtons(false);
 				}
 			}
+			
+			if (array.length > 2)
+			{
+				if (array[2] == "")
+				{
+					checkUpdates();
+				}
+				else
+				{
+					check_update_date = Date.fromString(array[2]);
+					
+					if (Date.now().getTime() - check_update_date.getTime() > DateTools.days(7))
+					{
+						checkUpdates();
+					}
+				}
+			}
+			else
+			{
+				checkUpdates();
+			}
 		}
+		
+		download_dialog = new DownloadDialog();
+		addChild(download_dialog);
+		
+		progress_bar = new ProgressBar();
+		progress_bar.y = 480-progress_bar.height;
+		background.addChild(progress_bar);
 		
 		addEventListener(Event.ACTIVATE, onActivate );
 		addEventListener(Event.DEACTIVATE, onDeactivate );
 		stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
 						
 		//trace(WorkoutData.getAllRecords());
+	}
+	
+	private function onDownloadProgress(e:ProgressEvent):Void 
+	{
+		progress_bar.setValue(url_loader3.bytesLoaded, url_loader3.bytesTotal);
+	}
+	
+	private function onDownloadSetupComplete(e:Event):Void 
+	{
+		if (Crc32.make(url_loader3.data) == crc)
+		{
+			File.saveBytes(Utils.getExecutablePath() + "EnduranceLoggerSetup.exe", url_loader3.data);
+			var array:Array<String> = new Array();
+			array.push(Utils.getExecutablePath() + "EnduranceLoggerSetup.exe");
+			new Process("explorer", array);
+			Sys.exit(0);
+		}
+		else
+		{
+			info_panel.show("Download failed, please download manually at https://github.com/as3boyan/EnduranceLogger");
+		}
+	}
+	
+	private function onDownloadChangeLogComplete(e:Event):Void 
+	{
+		download_dialog.setCommitLog(url_loader2.data);
+		download_dialog.show();
+	}
+	
+	function checkUpdates() 
+	{		
+		if (url_loader.bytesTotal == -1 || url_loader.bytesLoaded == url_loader.bytesTotal)
+		{			
+			check_update_date = Date.now();
+			saveSettings();
+			
+			url_loader.load(new URLRequest(dropbox_url + "EnduranceLoggerCrc.txt"));
+		}
+	}
+	
+	public function startDownload():Void
+	{
+		progress_bar.visible = true;
+		url_loader3.load(new URLRequest(dropbox_url + "EnduranceLoggerSetup.exe"));
+	}
+	
+	private function onDownloadComplete(e:Event):Void 
+	{
+		var update_info_string:String = url_loader.data;
+		var update_info:Array<String> = update_info_string.split("|");
+		
+		if (update_info.length > 1)
+		{
+			crc = Std.parseInt(update_info[0]);
+			var date:Date = Date.fromString(update_info[1]);
+			
+			if (Date.fromString(Utils.getBuildDate()).getTime() < date.getTime())
+			{
+				Sys.println("New version of Endurance Logger is available at https://github.com/as3boyan/EnduranceLogger");
+				url_loader2.load(new URLRequest(dropbox_url + "changelog.txt"));
+			}
+			else
+			{
+				Sys.println("You have latest version installed");
+			}
+		}
 	}
 	
 	private function onKeyDown(e:KeyboardEvent):Void 
@@ -379,6 +504,7 @@ class Main extends Sprite
 				{
 					input_field.hide();
 				}
+				
 			case Keyboard.M:
 				GV.sound_on = !GV.sound_on;
 				
@@ -392,9 +518,13 @@ class Main extends Sprite
 				}
 				
 				saveSettings();
-			case Keyboard.T:
+
+			case Keyboard.S:
 				toggleSocialButtons();
 				saveSettings();
+				
+			case Keyboard.U:
+				checkUpdates();
 		}
 	}
 	
@@ -413,12 +543,14 @@ class Main extends Sprite
 		
 		if (GV.social_buttons_on)
 		{
-			str += "1";
+			str += "1|";
 		}
 		else
 		{
-			str += "0";
+			str += "0|";
 		}
+		
+		str += check_update_date.toString();
 		
 		TextFileUtils.updateTextFile(Utils.getExecutablePath() + "settings.cfg", str);
 	}

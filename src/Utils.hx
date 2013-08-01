@@ -18,6 +18,7 @@
 */
 
 package ;
+import haxe.macro.Context;
 
 class Utils
 {
@@ -75,6 +76,11 @@ class Utils
 		var executable_path:String = Sys.executablePath();
 		executable_path = executable_path.substring(0, executable_path.lastIndexOf("\\")) + "\\";
 		return executable_path;
+	}
+	
+	macro static public function getBuildDate()
+	{
+		return Context.makeExpr(Date.now().toString(), Context.currentPos());
 	}
 	
 }
