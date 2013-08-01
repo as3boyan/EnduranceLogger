@@ -167,6 +167,7 @@ Section Uninstall
   Delete "$INSTDIR\EnduranceLogger.exe"
   Delete "$INSTDIR\application.xml"
   Delete "$INSTDIR\workout.db"
+  Delete "$INSTDIR\settings.cfg"
 
   Delete "$SMPROGRAMS\Endurance Logger\Uninstall.lnk"
   Delete "$SMPROGRAMS\Endurance Logger\Website.lnk"

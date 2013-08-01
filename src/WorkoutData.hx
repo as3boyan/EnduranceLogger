@@ -210,6 +210,8 @@ class WorkoutData
 		
 		if (first_workout_date == null) return workout_stats_array;
 		
+		first_workout_date = new Date(first_workout_date.getFullYear(), first_workout_date.getMonth(), 1, 0, 0, 0);
+		
 		var month_start_date:Date = getMonthStartDate(date1);
 		
 		var year:Int = month_start_date.getFullYear();

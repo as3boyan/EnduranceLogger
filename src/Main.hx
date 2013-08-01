@@ -252,6 +252,8 @@ class Main extends Sprite
 		info_panel = new InfoPanel();
 		addChild(info_panel);
 		
+		GV.setTimeRangeButtonMouseEnabled = setTimeRangeButtonMouseEnabled;
+		
 		var first_workout_date:Date = WorkoutData.getFirstWorkoutDate();
 		
 		if (first_workout_date == null)
@@ -628,6 +630,14 @@ class Main extends Sprite
 			case 3: tf_info.appendText(" in this month");
 			case 4: tf_info.appendText(" in this year");
 			case 5: tf_info.appendText(" during all the time");
+		}
+	}
+	
+	public function setTimeRangeButtonMouseEnabled(bool:Bool):Void
+	{
+		for (i in 0...time_range_buttons.length)
+		{
+			time_range_buttons[i].mouseEnabled = bool;
 		}
 	}
 	

@@ -81,11 +81,15 @@ class Button extends Sprite
 	
 	private function onMouseOut(e:MouseEvent):Void 
 	{
+		if (!mouseEnabled) return;
+		
 		Actuate.tween(this, 1, { x:start_x, y:start_y, scaleX:1, scaleY:1 }, false );
 	}
 	
 	private function onMouseOver(e:MouseEvent):Void 
 	{		
+		if (!mouseEnabled) return;
+		
 		Actuate.tween(this, 1, { x:start_x - width * 0.1, y:start_y - height * 0.1, scaleX:1.2, scaleY:1.2 }, false );
 		parent.setChildIndex(this, parent.numChildren - 1);
 		

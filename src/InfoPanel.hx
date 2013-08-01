@@ -102,6 +102,10 @@ class InfoPanel extends Sprite
 			
 			showText(text_queue_element);
 		}
+		else
+		{
+			GV.setTimeRangeButtonMouseEnabled(true);
+		}
 	}
 	
 	function showText(_text:String):Void
@@ -117,6 +121,8 @@ class InfoPanel extends Sprite
 		mouseEnabled = true;
 		active = true;
 		parent.setChildIndex(this, parent.numChildren - 1);
+		
+		GV.setTimeRangeButtonMouseEnabled(false);
 	}
 	
 	private function onAdded(e:Event):Void 
