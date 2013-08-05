@@ -19,6 +19,7 @@
 
 package ;
 import flash.display.Bitmap;
+import flash.display.PixelSnapping;
 import flash.display.Sprite;
 import flash.events.MouseEvent;
 import flash.Lib;
@@ -35,7 +36,7 @@ class SocialButton extends Scalable
 		
 		url = _url;
 		
-		addChild(new Bitmap(Assets.getBitmapData(_image_path)));
+		addChild(new Bitmap(Assets.getBitmapData(_image_path),PixelSnapping.AUTO, true));
 		addEventListener(MouseEvent.CLICK, onClick);
 	}
 	

@@ -31,10 +31,5 @@ class GV
 	public static var social_buttons_on:Bool;
 	static public var setTimeRangeButtonMouseEnabled:Dynamic;
 	public static var startDownload:Dynamic;
-	
-	public function new() 
-	{
-		
-	}
-	
+	public static var notifications_on:Bool;	
 }

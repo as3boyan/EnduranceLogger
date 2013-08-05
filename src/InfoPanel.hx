@@ -76,12 +76,15 @@ class InfoPanel extends Sprite
 	
 	public function show(_text:String, _time:Int = 3000):Void
 	{
-		text_queue.push(_text);
-		time_queue.push(_time);
-		
-		if (!active)
+		if (GV.notifications_on)
 		{
-			checkQueue();
+			text_queue.push(_text);
+			time_queue.push(_time);
+			
+			if (!active)
+			{
+				checkQueue();
+			}
 		}
 	}
 	

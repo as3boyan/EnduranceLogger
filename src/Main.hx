@@ -82,6 +82,7 @@ class Main extends Sprite
 	var download_dialog:DownloadDialog;
 	var crc:Int;
 	var progress_bar:ProgressBar;
+	var youtube_image:SocialButton;
 	
 	/* ENTRY POINT */
 	
@@ -152,7 +153,7 @@ class Main extends Sprite
 		
 		for (i in 0...5)
 		{
-			var time_range_button:Button = new Button(this, i * 75 + stage.stageWidth - 5*75 + 15 - 80, 20, time_range_text[i]);
+			var time_range_button:Button = new Button(this, i * 75 + stage.stageWidth - 5*75 + 15 - 80 - 52, 20, time_range_text[i]);
 			time_range_button.setWidth(75, 25, 0xF8F8F8);
 			time_range_button.time_range = i + 1;
 			time_range_buttons.push(time_range_button);
@@ -160,13 +161,17 @@ class Main extends Sprite
 						
 		setChildIndex(time_range_buttons[0], numChildren - 1);
 		
-		twitter_image = new SocialButton("img/twitter-bird-16x16.png", "http://twitter.com/share?url=https://github.com/as3boyan/EnduranceLogger&text=I just got an open source Endurance Logger(fitness tracker) by @AS3Boyan It rocks! Get fit!");
-		twitter_image.setPos(time_range_buttons[time_range_buttons.length - 1].x + 75 + 15 - 3 , time_range_buttons[time_range_buttons.length - 1].y + 5);
+		twitter_image = new SocialButton("img/twitter-bird-16x16.png", "http://twitter.com/share?url=https://github.com/as3boyan/EnduranceLogger&text=I just got an free open source Endurance Logger(fitness tracker) by @AS3Boyan It rocks! Get fit!");
+		twitter_image.setPos(time_range_buttons[time_range_buttons.length - 1].x + 75 + 15 + 3 - 5 , time_range_buttons[time_range_buttons.length - 1].y + 5);
 		background.addChild(twitter_image);
 		
 		googleplus_image = new SocialButton("img/gplus-16.png", "https://plus.google.com/share?url=https://github.com/as3boyan/EnduranceLogger&hl=en-US");
-		googleplus_image.setPos(time_range_buttons[time_range_buttons.length - 1].x + 75 + 15 + 35 - 3, time_range_buttons[time_range_buttons.length - 1].y + 5);
+		googleplus_image.setPos(time_range_buttons[time_range_buttons.length - 1].x + 75 + 15 + 35 + 8 - 14 + 3 - 5 - 1, time_range_buttons[time_range_buttons.length - 1].y + 5);
 		background.addChild(googleplus_image);
+		
+		youtube_image = new SocialButton("img/yt-brand-standard-logo.png", "http://www.youtube.com/playlist?list=PLa_bm2sT2AiZkgJ_1JX_557aUS0bXQCgo");
+		youtube_image.setPos(time_range_buttons[time_range_buttons.length - 1].x + 75 + 15 + 35 + 30 + 7 - 17 - 2, time_range_buttons[time_range_buttons.length - 1].y + 1);
+		background.addChild(youtube_image);
 		
 		var text_format:TextFormat = new TextFormat();
 		text_format.font = "Arial";
@@ -267,34 +272,7 @@ class Main extends Sprite
 		addChild(info_panel);
 		
 		GV.setTimeRangeButtonMouseEnabled = setTimeRangeButtonMouseEnabled;
-		
-		var first_workout_date:Date = WorkoutData.getFirstWorkoutDate();
-		
-		if (first_workout_date == null)
-		{
-			info_panel.show("Hello!");
-		}
-		else
-		{
-			info_panel.show("Hello, and welcome back!");
-		}
-		
-		var tips:Array<String> = new Array();
-		tips.push("Don't forget to warm up!");
-		tips.push("Eat healthy, small and often");
-		tips.push("Avoid sleep deprivation");
-		tips.push("Avoid overtraining");
-		tips.push("Exercise using a good form");
-		tips.push("Drink plenty of water");
-		tips.push("Moderate physical activity is good for health");
-		tips.push("Increase workout intensity gradually");
-		tips.push("Be positive and optimistic");
-		tips.push("Improve your sleep regimen and keep it healthy");
-		
-		info_panel.show("Tip of the Day:\n" + tips[Utils.randInt(0,tips.length-1)]);
 				
-		GV.showText = info_panel.show;
-		
 		//var fps:FPS = new FPS();
 		//addChild(fps);
 				
@@ -311,6 +289,7 @@ class Main extends Sprite
 		
 		GV.sound_on = true;
 		GV.social_buttons_on = true;
+		GV.notifications_on = true;
 		
 		dropbox_url = "https://dl.dropboxusercontent.com/u/107033883/";
 		
@@ -368,6 +347,14 @@ class Main extends Sprite
 			{
 				checkUpdates();
 			}
+			
+			if (array.length > 3)
+			{
+				if (array[3] == "0")
+				{
+					GV.notifications_on = false;
+				}
+			}
 		}
 		
 		download_dialog = new DownloadDialog();
@@ -381,6 +368,33 @@ class Main extends Sprite
 		addEventListener(Event.DEACTIVATE, onDeactivate );
 		stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
 						
+		var first_workout_date:Date = WorkoutData.getFirstWorkoutDate();
+		
+		if (first_workout_date == null)
+		{
+			info_panel.show("Hello!");
+		}
+		else
+		{
+			info_panel.show("Hello, and welcome back!");
+		}
+		
+		var tips:Array<String> = new Array();
+		tips.push("Don't forget to warm up!");
+		tips.push("Eat healthy, small and often");
+		tips.push("Avoid sleep deprivation");
+		tips.push("Avoid overtraining");
+		tips.push("Exercise using a good form");
+		tips.push("Drink plenty of water");
+		tips.push("Moderate physical activity is good for health");
+		tips.push("Increase workout intensity gradually");
+		tips.push("Be positive and optimistic");
+		tips.push("Improve your sleep regimen and keep it healthy");
+		
+		info_panel.show("Tip of the Day:\n" + tips[Utils.randInt(0,tips.length-1)]);
+				
+		GV.showText = info_panel.show;
+		
 		//trace(WorkoutData.getAllRecords());
 	}
 	
@@ -525,6 +539,20 @@ class Main extends Sprite
 				
 			case Keyboard.U:
 				checkUpdates();
+				
+			case Keyboard.N:
+				GV.notifications_on = !GV.notifications_on;
+				
+				if (GV.notifications_on)
+				{
+					info_panel.show("Notifications are turned on now");
+				}
+				else
+				{
+					trace("Notifications are turned off now");
+				}
+				
+				saveSettings();
 		}
 	}
 	
@@ -550,7 +578,16 @@ class Main extends Sprite
 			str += "0|";
 		}
 		
-		str += check_update_date.toString();
+		str += check_update_date.toString() + "|";
+		
+		if (GV.notifications_on)
+		{
+			str += "1|";
+		}
+		else
+		{
+			str += "0|";
+		}
 		
 		TextFileUtils.updateTextFile(Utils.getExecutablePath() + "settings.cfg", str);
 	}
@@ -560,12 +597,13 @@ class Main extends Sprite
 		GV.social_buttons_on = !GV.social_buttons_on;
 		twitter_image.visible = GV.social_buttons_on;
 		googleplus_image.visible = GV.social_buttons_on;
+		youtube_image.visible = GV.social_buttons_on;
 		
-		if (twitter_image.visible == true)
+		if (GV.social_buttons_on == true)
 		{
 			for (i in 0...time_range_buttons.length)
 			{
-				time_range_buttons[i].setPos(i * 75 + stage.stageWidth - 5 * 75 + 15 - 80, 20, animated);
+				time_range_buttons[i].setPos(i * 75 + stage.stageWidth - 5 * 75 + 15 - 80 - 52, 20, animated);
 			}
 		}
 		else
