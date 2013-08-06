@@ -17,75 +17,49 @@
  * along with Endurance Logger.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package ;
+package ui;
 
 import flash.display.Sprite;
-import flash.events.MouseEvent;
 import flash.text.TextField;
+import flash.text.TextFormat;
+import flash.text.TextFormatAlign;
+import motion.Actuate;
 
-class ColoredPoint extends Sprite
+class ProgressBar extends Sprite
 {
 	var tf:TextField;
+	var background:ColoredRect;
 
 	public function new() 
 	{
 		super();
 		
+		background = new ColoredRect(800, 12, 0x229ABD);
+		addChild(background);
+		
+		var text_format:TextFormat = new TextFormat("Arial", 8);
+		text_format.align = TextFormatAlign.CENTER;
+		
 		tf = new TextField();
-		tf.y = -50;
-		tf.width = 150;
-		tf.height = 50;
-		tf.multiline = true;
+		tf.defaultTextFormat = text_format;
+		tf.text = "0";
+		tf.width = width;
+		tf.height = 12;
 		tf.selectable = false;
-		tf.visible = false;
-		tf.mouseEnabled = false;
 		addChild(tf);
 		
-		addEventListener(MouseEvent.MOUSE_OVER, onMouseOver);
-		addEventListener(MouseEvent.MOUSE_OUT, onMouseOut);
-	}
-	
-	private function onMouseOver(e:MouseEvent):Void 
-	{
-		tf.visible = true;
+		mouseEnabled = false;
 		
-		if (x + 150 > stage.stageWidth)
-		{
-			tf.x = (stage.stageWidth - 150 - x);
-		}
-		else
-		{
-			tf.x = 0;
-		}
+		width = 800;
 		
-		if (y < 100)
-		{
-			tf.y = 15;
-		}
-		else
-		{
-			tf.y = -50;
-		}
-		
-		parent.setChildIndex(this, parent.numChildren - 1);
+		visible = false;
 	}
 	
-	private function onMouseOut(e:MouseEvent):Void 
+	public function setValue(_bytesLoaded, _bytesTotal):Void
 	{
-		tf.visible = false;
-	}
-	
-	public function setColor(_color:Int, ?_alpha:Float = 1)
-	{
-		graphics.clear();
-		graphics.beginFill(_color);
-		graphics.drawCircle(0, 0, 10);
-		graphics.endFill();
-	}
-	
-	public function setText(_string:String, _value:Int)
-	{
-		tf.text = Std.string(_value) + " " + GV.exercise_text[GV.exercise_type-1].toLowerCase() + "\n" + _string;
+		var percent:Float = _bytesLoaded / _bytesTotal;
+		background.width = Math.max(percent * 800,1);
+		tf.text = Std.string(Std.int(_bytesLoaded / 1024)) + " KB/ " + Std.string(Std.int(_bytesTotal / 1024)) + " KB"; 
 	}
 	
 }

@@ -17,49 +17,32 @@
  * along with Endurance Logger.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package ;
-
+package ui;
 import flash.display.Sprite;
-import flash.text.TextField;
-import flash.text.TextFormat;
-import flash.text.TextFormatAlign;
+import flash.events.MouseEvent;
 import motion.Actuate;
 
-class ProgressBar extends Sprite
+class Scalable extends Sprite
 {
-	var tf:TextField;
-	var background:ColoredRect;
-
+	var start_x:Float;
+	var start_y:Float;
+	
 	public function new() 
 	{
 		super();
 		
-		background = new ColoredRect(800, 12, 0x229ABD);
-		addChild(background);
-		
-		var text_format:TextFormat = new TextFormat("Arial", 8);
-		text_format.align = TextFormatAlign.CENTER;
-		
-		tf = new TextField();
-		tf.defaultTextFormat = text_format;
-		tf.text = "0";
-		tf.width = width;
-		tf.height = 12;
-		tf.selectable = false;
-		addChild(tf);
-		
-		mouseEnabled = false;
-		
-		width = 800;
-		
-		visible = false;
+		addEventListener(MouseEvent.MOUSE_OUT, onMouseOut);
+		addEventListener(MouseEvent.MOUSE_OVER, onMouseOver);
 	}
 	
-	public function setValue(_bytesLoaded, _bytesTotal):Void
+	private function onMouseOut(e:MouseEvent):Void 
 	{
-		var percent:Float = _bytesLoaded / _bytesTotal;
-		background.width = Math.max(percent * 800,1);
-		tf.text = Std.string(Std.int(_bytesLoaded / 1024)) + " KB/ " + Std.string(Std.int(_bytesTotal / 1024)) + " KB"; 
+		Actuate.tween(this, 1, { x:start_x, y:start_y, scaleX:1, scaleY:1 }, false );
+	}
+	
+	private function onMouseOver(e:MouseEvent):Void 
+	{		
+		Actuate.tween(this, 1, { x:start_x - width * 0.1, y:start_y - height * 0.1, scaleX:1.2, scaleY:1.2 }, false );
 	}
 	
 }

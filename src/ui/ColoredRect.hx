@@ -17,17 +17,22 @@
  * along with Endurance Logger.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package ;
+package ui;
 
-class WorkoutInfo
+import flash.display.Sprite;
+
+class ColoredRect extends Sprite
 {
-	public var date:String;
-	public var value:Int;
 
-	public function new(_date:String, _value:Int) 
+	public function new(_width:Int, _height:Int, ?_color:Int=-1) 
 	{
-		date = _date;
-		value = _value;
+		super();
+		
+		if (_color == -1) _color = Utils.adjustBrightness(Utils.randColor(),100);
+		graphics.beginFill(_color);
+		graphics.drawRect(0, 0, _width, _height);
+		graphics.endFill();
+		//trace(_color);
 	}
 	
 }

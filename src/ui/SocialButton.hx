@@ -17,7 +17,7 @@
  * along with Endurance Logger.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package ;
+package ui;
 import flash.display.Bitmap;
 import flash.display.PixelSnapping;
 import flash.display.Sprite;

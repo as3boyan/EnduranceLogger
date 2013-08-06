@@ -17,7 +17,7 @@
  * along with Endurance Logger.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package ;
+package ui;
 
 import flash.display.BlendMode;
 import flash.display.Sprite;

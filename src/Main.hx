@@ -19,6 +19,8 @@
 
 package ;
 
+import db.WorkoutData;
+import db.WorkoutInfo;
 import fileutils.TextFileUtils;
 import flash.display.Bitmap;
 import flash.display.Sprite;
@@ -47,6 +49,15 @@ import openfl.Assets;
 import openfl.display.FPS;
 import sys.io.File;
 import sys.io.Process;
+import ui.Button;
+import ui.ColoredPoint;
+import ui.ColoredPointsManager;
+import ui.ColoredRect;
+import ui.DownloadDialog;
+import ui.InfoPanel;
+import ui.InputField;
+import ui.ProgressBar;
+import ui.SocialButton;
 
 class Main extends Sprite 
 {
@@ -399,7 +410,10 @@ class Main extends Sprite
 				
 		GV.showText = info_panel.show;
 		
-		//trace(WorkoutData.getAllRecords());
+		//for (workout_info in WorkoutData.getAllRecords())
+		//{
+			//trace("new WorkoutInfo(" + workout_info.date + "," + workout_info.value + ")");
+		//}
 	}
 	
 	private function onDownloadProgress(e:ProgressEvent):Void 

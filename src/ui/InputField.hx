@@ -17,8 +17,9 @@
  * along with Endurance Logger.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package ;
+package ui;
 
+import db.WorkoutData;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
