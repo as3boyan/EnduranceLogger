@@ -80,7 +80,7 @@ class Utils
 	
 	macro static public function getBuildDate()
 	{
-		return Context.makeExpr(Date.now().toString(), Context.currentPos());
+		return Context.makeExpr(DateTools.delta(Date.now(), DateTools.hours(1)).toString(), Context.currentPos());
 	}
 	
 }

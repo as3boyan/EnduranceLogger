@@ -356,6 +356,10 @@ class Main extends Sprite
 				}
 			}
 		}
+		else
+		{
+			checkUpdates();
+		}
 		
 		download_dialog = new DownloadDialog();
 		addChild(download_dialog);
@@ -451,8 +455,9 @@ class Main extends Sprite
 		{
 			crc = Std.parseInt(update_info[0]);
 			var date:Date = Date.fromString(update_info[1]);
+			var build_date:Date = Date.fromString(Utils.getBuildDate());
 			
-			if (Date.fromString(Utils.getBuildDate()).getTime() < date.getTime())
+			if (build_date.getTime() < date.getTime())
 			{
 				Sys.println("New version of Endurance Logger is available at https://github.com/as3boyan/EnduranceLogger");
 				url_loader2.load(new URLRequest(dropbox_url + "changelog.txt"));
@@ -549,7 +554,7 @@ class Main extends Sprite
 				}
 				else
 				{
-					trace("Notifications are turned off now");
+					Sys.println("Notifications are turned off now");
 				}
 				
 				saveSettings();
