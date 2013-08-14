@@ -37,12 +37,13 @@ class InfoPanel extends Sprite
 	var text_queue:Array<String>;
 	var time_queue:Array<Int>;
 	var active:Bool;
+	var text_format:TextFormat;
 	
 	public function new() 
 	{		
 		super();
 		
-		var text_format:TextFormat = new TextFormat();
+		text_format = new TextFormat();
 		text_format.align = TextFormatAlign.CENTER;
 		text_format.font = "Arial";
 		text_format.size = 36;
@@ -103,6 +104,25 @@ class InfoPanel extends Sprite
 		{
 			var text_queue_element:String = text_queue.splice(0, 1)[0];
 			
+			if (text_queue_element.length > 250)
+			{
+				text_format.size = 12;
+			}
+			else if (text_queue_element.length > 150)
+			{
+				text_format.size = 22;
+			}
+			else if (text_queue_element.length > 100)
+			{
+				text_format.size = 24;
+			}
+			else
+			{
+				text_format.size = 36;
+			}
+			
+			tf.defaultTextFormat = text_format;
+			
 			showText(text_queue_element);
 		}
 		else
@@ -114,7 +134,7 @@ class InfoPanel extends Sprite
 	function showText(_text:String):Void
 	{
 		tf.text = _text;
-		tf.y = (height - tf.textHeight) / 2;
+		tf.y = (480 / 4 - tf.textHeight) / 2;
 		
 		Actuate.tween(this, 1, { y: 0 } );
 	
@@ -133,11 +153,11 @@ class InfoPanel extends Sprite
 		removeEventListener(Event.ADDED_TO_STAGE, onAdded);
 		
 		graphics.beginFill(0x000000);
-		graphics.drawRect(0, 0, stage.stageWidth, stage.stageHeight / 4);
+		graphics.drawRect(0, 0, 800, 480 / 4);
 		graphics.endFill();
 		
-		tf.width = stage.stageWidth;
-		tf.height = stage.stageHeight / 4;
+		tf.width = 800;
+		tf.height = 480 / 4;
 		
 		y = -height;
 	}

@@ -71,12 +71,21 @@ class Utils
 		return combineRGB(r,g,b);
 	}
 	
+	static public function getDistance(x1:Float, y1:Float, x2:Float, y2:Float):Float
+	{
+		var dx = x2-x1;
+		var dy = y2-y1;
+		return Math.sqrt(dx*dx + dy*dy);
+	}
+	
+	#if (neko || cpp)
 	static public function getExecutablePath():String
 	{
 		var executable_path:String = Sys.executablePath();
 		executable_path = executable_path.substring(0, executable_path.lastIndexOf("\\")) + "\\";
 		return executable_path;
 	}
+	#end
 	
 	macro static public function getBuildDate()
 	{

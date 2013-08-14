@@ -29,7 +29,8 @@ class GV
 	public static var showText:Dynamic;
 	public static var sound_on:Bool;
 	public static var social_buttons_on:Bool;
-	static public var setTimeRangeButtonMouseEnabled:Dynamic;
+	public static var setTimeRangeButtonMouseEnabled:Dynamic;
 	public static var startDownload:Dynamic;
-	public static var notifications_on:Bool;	
+	public static var notifications_on:Bool;
+	public static var check_update_date:Date;
 }

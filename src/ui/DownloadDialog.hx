@@ -42,17 +42,17 @@ class DownloadDialog extends Sprite
 		
 		var tf_title:TextField = new TextField();
 		tf_title.defaultTextFormat = text_format2;
-		tf_title.text = "New version available!";
+		tf_title.text = Localization.get("$NEWVERSION");
 		tf_title.width = width;
 		tf_title.height = 30;
 		tf_title.y = 10;
 		addChild(tf_title);
 		
-		var start_download_button:Button = new Button(this, width/2 - 75, 275, "Start download", onStartDownloadClick);
+		var start_download_button:Button = new Button(this, width/2 - 75, 275, Localization.get("$STARTDOWNLOAD"), onStartDownloadClick);
 		start_download_button.setWidth(null, null, 3984056);
 		addChild(start_download_button);
 		
-		var cancel_button:Button = new Button(this, width/2 + 75, 275, "Cancel", onCancelClick);
+		var cancel_button:Button = new Button(this, width/2 + 75, 275, Localization.get("$CANCEL"), onCancelClick);
 		cancel_button.setWidth(null, null, 16777106);
 		addChild(cancel_button);
 		
@@ -105,8 +105,8 @@ class DownloadDialog extends Sprite
 	{
 		removeEventListener(Event.ADDED_TO_STAGE, onAdded);
 		
-		x = (stage.stageWidth - width) / 2;
-		y = (stage.stageHeight - height) / 2;
+		x = (800 - width) / 2;
+		y = (480 - height) / 2;
 	}
 	
 	public function setCommitLog(_text:String)

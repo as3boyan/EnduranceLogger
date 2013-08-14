@@ -19,7 +19,9 @@
 
 package ui;
 import flash.display.Sprite;
+import flash.events.Event;
 import flash.events.MouseEvent;
+import flash.events.TouchEvent;
 import motion.Actuate;
 
 class Scalable extends Sprite
@@ -31,8 +33,52 @@ class Scalable extends Sprite
 	{
 		super();
 		
+		start_x = 1;
+		start_y = 1;
+		
+		addEventListener(Event.ADDED_TO_STAGE, onAdded);
+	}
+	
+	private function onAdded(e:Event):Void 
+	{
+		removeEventListener(Event.ADDED_TO_STAGE, onAdded);
+		
+		#if mobile
+		addEventListener(TouchEvent.TOUCH_OUT, onTouchOut);
+		addEventListener(TouchEvent.TOUCH_OVER, onTouchOver);
+		addEventListener(TouchEvent.TOUCH_END, onTouchEnd);
+		#else
+		
 		addEventListener(MouseEvent.MOUSE_OUT, onMouseOut);
 		addEventListener(MouseEvent.MOUSE_OVER, onMouseOver);
+		
+		useHandCursor = true;
+		buttonMode = true;
+		#end
+	}
+	
+	private function onTouchEnd(e:TouchEvent):Void 
+	{
+		onMouseOut(null);
+	}
+	
+	private function onTouchOver(e:TouchEvent):Void 
+	{
+		onMouseOver(null);
+	}
+	
+	private function onTouchOut(e:TouchEvent):Void 
+	{
+		onMouseOut(null);
+	}
+	
+	public function setPos(_x:Float, _y:Float):Void 
+	{
+		x = _x;
+		y = _y;
+		
+		start_x = _x;
+		start_y = _y;
 	}
 	
 	private function onMouseOut(e:MouseEvent):Void 

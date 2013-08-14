@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="152"
+   height="152"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="endurancelogger.svg">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="4"
+     inkscape:cx="61.234172"
+     inkscape:cy="81.006728"
+     inkscape:document-units="px"
+     inkscape:current-layer="text3014"
+     showgrid="false"
+     inkscape:window-width="773"
+     inkscape:window-height="423"
+     inkscape:window-x="26"
+     inkscape:window-y="26"
+     inkscape:window-maximized="0" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-900.36218)">
+    <g
+       id="g3786">
+      <rect
+         inkscape:export-ydpi="59.581722"
+         inkscape:export-xdpi="59.581722"
+         inkscape:export-filename="C:\Projects\EnduranceLogger\assets\text3014.png"
+         y="900.36218"
+         x="0"
+         height="151.84438"
+         width="30.425974"
+         id="rect3004"
+         style="fill:#e3c2dd;fill-opacity:1;stroke:none" />
+      <rect
+         inkscape:export-ydpi="59.581722"
+         inkscape:export-xdpi="59.581722"
+         inkscape:export-filename="C:\Projects\EnduranceLogger\assets\text3014.png"
+         style="fill:#5ab3dc;fill-opacity:1;stroke:none"
+         id="rect3006"
+         width="30.426315"
+         height="151.84393"
+         x="30.413185"
+         y="900.48993" />
+      <rect
+         inkscape:export-ydpi="59.581722"
+         inkscape:export-xdpi="59.581722"
+         inkscape:export-filename="C:\Projects\EnduranceLogger\assets\text3014.png"
+         style="fill:#b1e09c;fill-opacity:1;stroke:none"
+         id="rect3008"
+         width="30.426315"
+         height="151.84393"
+         x="60.850075"
+         y="900.5072" />
+      <rect
+         inkscape:export-ydpi="59.581722"
+         inkscape:export-xdpi="59.581722"
+         inkscape:export-filename="C:\Projects\EnduranceLogger\assets\text3014.png"
+         y="900.47858"
+         x="91.13195"
+         height="151.84393"
+         width="30.426315"
+         id="rect3010"
+         style="fill:#54d4cb;fill-opacity:1;stroke:none" />
+      <rect
+         inkscape:export-ydpi="59.581722"
+         inkscape:export-xdpi="59.581722"
+         inkscape:export-filename="C:\Projects\EnduranceLogger\assets\text3014.png"
+         style="fill:#d0e46b;fill-opacity:1;stroke:none"
+         id="rect3012"
+         width="30.426315"
+         height="151.84393"
+         x="121.57368"
+         y="900.51825" />
+      <g
+         transform="scale(0.97225656,1.0285351)"
+         style="font-size:45.13920212px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#535353;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+         id="text3014">
+        <path
+           d="m 17.285187,991.40057 0,-83.08685 60.076445,0 0,9.80492 -49.081322,0 0,25.44748 45.964148,0 0,9.74825 -45.964148,0 0,28.28127 51.008303,0 0,9.80493 z"
+           style="font-size:116.07222748px;fill:#535353;font-family:Arial;-inkscape-font-specification:Arial"
+           id="path4523" />
+        <path
+           d="m 94.137699,991.40057 0,-83.08685 10.995121,0 0,73.28192 40.92,0 0,9.80493 z"
+           style="font-size:116.07222748px;fill:#535353;font-family:Arial;-inkscape-font-specification:Arial"
+           id="path4525" />
+      </g>
+    </g>
+  </g>
+</svg>

@@ -19,9 +19,25 @@
 
 package ;
 
-import db.WorkoutData;
+import db.WorkoutData2;
 import db.WorkoutInfo;
+import motion.easing.Bounce;
+import motion.easing.Bounce.BounceEaseIn;
+
+#if flash
+import fgl.gametracker.GameTracker;
+#end
+
+import flash.display.PixelSnapping;
+import flash.system.Capabilities;
+import haxe.Utf8;
+import so.WorkoutData;
+import ui.LanguageButton;
+
+#if windows
 import fileutils.TextFileUtils;
+#end
+
 import flash.display.Bitmap;
 import flash.display.Sprite;
 import flash.events.Event;
@@ -47,8 +63,12 @@ import motion.easing.Cubic;
 import motion.easing.Linear;
 import openfl.Assets;
 import openfl.display.FPS;
+
+#if windows
 import sys.io.File;
 import sys.io.Process;
+#end
+
 import ui.Button;
 import ui.ColoredPoint;
 import ui.ColoredPointsManager;
@@ -58,6 +78,8 @@ import ui.InfoPanel;
 import ui.InputField;
 import ui.ProgressBar;
 import ui.SocialButton;
+
+import firetongue.FireTongue;
 
 class Main extends Sprite 
 {
@@ -85,7 +107,6 @@ class Main extends Sprite
 	var info_panel:InfoPanel;
 	var twitter_image:SocialButton;
 	var googleplus_image:SocialButton;
-	var check_update_date:Date;
 	var url_loader:URLLoader;
 	var url_loader2:URLLoader;
 	var url_loader3:URLLoader;
@@ -94,6 +115,13 @@ class Main extends Sprite
 	var crc:Int;
 	var progress_bar:ProgressBar;
 	var youtube_image:SocialButton;
+	var week_days:Array<String>;
+	var month_text:Array<String>;
+	var language_buttons:Array<LanguageButton>;
+	
+	#if flash
+	static public var tracker:GameTracker;
+	#end
 	
 	/* ENTRY POINT */
 	
@@ -101,6 +129,28 @@ class Main extends Sprite
 	{
 		if (!inited) init();
 		// else (resize or orientation change)
+		
+		scaleX = stage.stageWidth/800;
+		scaleY = stage.stageHeight/480;
+	}
+	
+	function show_sitelock()
+	{
+		info_panel = new InfoPanel();
+		addChild(info_panel);
+				
+		GV.setTimeRangeButtonMouseEnabled = setTimeRangeButtonMouseEnabled;
+		time_range_buttons = new Array();
+		
+		WorkoutData.load();
+		
+		var url:String = "https://www.fgl.com/view_game.php?from=sitelocked&game_id=29756";
+		
+		info_panel.show("Sorry, it's site-locked to FGL! You can use it at " + url, 500000);
+		
+		var button:Button = new Button(this, 800 / 2, 480 / 2 + 50, "Open FGL page", function ():Void {Lib.getURL(new URLRequest(url));});
+		button.setWidth(250, 50);
+		addChild(button);
 	}
 	
 	function init() 
@@ -111,17 +161,102 @@ class Main extends Sprite
 		// (your code here)
 		
 		// Stage:
-		// stage.stageWidth x stage.stageHeight @ stage.dpiScale
+		// 800 x 480 @ stage.dpiScale
 		
 		// Assets:
 		// nme.Assets.getBitmapData("img/assetname.jpg");
 		
-		WorkoutData.init();
+		GV.sound_on = true;
+		GV.social_buttons_on = true;
+		GV.notifications_on = true;
 		
+		#if fgl_only
+		var url_array:Array<String> = root.loaderInfo.url.split("/");
+		
+		if (url_array[2].indexOf("flashgamelicense.com") == -1 && url_array[2].indexOf("fgl.com") == -1)
+		{
+			#if debug
+			if (url_array[0].indexOf("file") == -1)
+			{
+				show_sitelock();
+				return;
+			}
+			#else
+			show_sitelock();	
+			return;
+			#end
+		}
+		#end
+		
+		resize(null);
+		
+		WorkoutData.load();
+		
+		Localization.init();
+		
+		#if blackberry
+		Localization.selectLocale("en-US", init2);
+		#else
+		
+		if (WorkoutData.loadLanguage())
+		{
+			Localization.selectLocale(WorkoutData.getLanguage(), init2);
+		}
+		else
+		{		
+			var locales = Localization.getLocales();
+			
+			language_buttons = new Array();
+			
+			var x_offset:Float = 0;
+			
+			for (locale in locales)
+			{			
+				var language_button:LanguageButton = new LanguageButton(Localization.getIcon(locale), locale, hideLanguageButtons.bind(locale));
+				x_offset = (800 - language_button.width * (locales.length - 1)) / 2;
+				language_button.setPos(x_offset + language_button.width * language_buttons.length / (locales.length-1) - language_button.width/2, 240 - language_button.height/2);
+				addChild(language_button);
+				language_buttons.push(language_button);
+			}
+		}
+		
+		#end
+	}
+	
+	public function hideLanguageButtons(locale:String="en-US"):Void
+	{
+		for (language_button in language_buttons)
+		{
+			language_button.hide();
+		}
+		
+		Localization.selectLocale(locale, init2.bind(locale) );
+	}
+	
+	public function init2(?locale:String = null):Void
+	{		
+		#if flash
+		tracker = new GameTracker();
+		tracker.beginGame();
+		
+		// MochiBot.com -- Version 8
+		// Tested with Flash 9-10, ActionScript 3
+		MochiBot.track(this, "dc1a2546");
+		#end
+		
+		#if !html5
+		so.WorkoutData.loadSettings();
+		#end
+		
+		#if (desktop && windows)
+		WorkoutData2.searchDatabase();
+		WorkoutData2.searchSettings();
+		#end
+				
 		colored_points_manager = new ColoredPointsManager(500);
 		colored_points_manager2 = new ColoredPointsManager(500);
-				
-		background = new ColoredRect(stage.stageWidth, stage.stageHeight, 0xFFFFFF);
+		
+		background = new ColoredRect(800, 480, 0xFFFFFF);
 		background.addEventListener(MouseEvent.CLICK, onClick);
 		addChild(background);
 		
@@ -135,11 +270,11 @@ class Main extends Sprite
 		GV.colors.push(13689963);
 		
 		GV.exercise_text = new Array();
-		GV.exercise_text.push("Pushups");
-		GV.exercise_text.push("Pullups");
-		GV.exercise_text.push("Squats");
-		GV.exercise_text.push("Situps");
-		GV.exercise_text.push("Dips");
+		GV.exercise_text.push(Localization.get("$PUSHUPS"));
+		GV.exercise_text.push(Localization.get("$PULLUPS"));
+		GV.exercise_text.push(Localization.get("$SQUATS"));
+		GV.exercise_text.push(Localization.get("$SITUPS"));
+		GV.exercise_text.push(Localization.get("$DIPS"));
 		
 		exercise_buttons = new Array();
 		
@@ -154,17 +289,17 @@ class Main extends Sprite
 		setChildIndex(exercise_buttons[0], numChildren - 1);
 		
 		var time_range_text:Array<String> = new Array();
-		time_range_text.push("Day");
-		time_range_text.push("Week");
-		time_range_text.push("Month");
-		time_range_text.push("Year");
-		time_range_text.push("All time");
+		time_range_text.push(Localization.get("$DAY"));
+		time_range_text.push(Localization.get("$WEEK"));
+		time_range_text.push(Localization.get("$MONTH"));
+		time_range_text.push(Localization.get("$YEAR"));
+		time_range_text.push(Localization.get("$ALLTIME"));
 		
 		time_range_buttons = new Array();
 		
 		for (i in 0...5)
 		{
-			var time_range_button:Button = new Button(this, i * 75 + stage.stageWidth - 5*75 + 15 - 80 - 52, 20, time_range_text[i]);
+			var time_range_button:Button = new Button(this, i * 75 + 800 - 5*75 + 15 - 80 - 52, 20, time_range_text[i]);
 			time_range_button.setWidth(75, 25, 0xF8F8F8);
 			time_range_button.time_range = i + 1;
 			time_range_buttons.push(time_range_button);
@@ -192,8 +327,8 @@ class Main extends Sprite
 		tf_info = new TextField();
 		tf_info.width = 700;
 		tf_info.height = 600;
-		tf_info.x = (stage.stageWidth - tf_info.width)/2 ;
-		tf_info.y = (stage.stageHeight/600 * 430 - tf_info.textHeight) / 2;
+		tf_info.x = (800 - tf_info.width)/2 ;
+		tf_info.y = (480/600 * 430 - tf_info.textHeight) / 2;
 		tf_info.defaultTextFormat = text_format;
 		tf_info.selectable = false;
 		tf_info.mouseEnabled = false;
@@ -256,7 +391,7 @@ class Main extends Sprite
 		tf_end_date.width = 150;
 		tf_end_date.height = 30;
 		tf_end_date.defaultTextFormat = text_format;
-		tf_end_date.x = stage.stageWidth-175;
+		tf_end_date.x = 800-175;
 		tf_end_date.y = 358 + tf_min.textHeight/2;
 		tf_end_date.selectable = false;
 		tf_end_date.mouseEnabled = false;
@@ -274,10 +409,12 @@ class Main extends Sprite
 		coords.push(39);
 		coords.push(35);
 		coords.push(365);
-		coords.push(stage.stageWidth-30);
+		coords.push(800-30);
 		coords.push(365);
 		
+		#if !html5
 		background.graphics.drawPath(commands, coords);		
+		#end
 		
 		info_panel = new InfoPanel();
 		addChild(info_panel);
@@ -297,13 +434,10 @@ class Main extends Sprite
 		GV.time_range = 1;		
 		GV.updateData = updateData;
 		GV.updateData();
-		
-		GV.sound_on = true;
-		GV.social_buttons_on = true;
-		GV.notifications_on = true;
-		
+				
 		dropbox_url = "https://dl.dropboxusercontent.com/u/107033883/";
 		
+		#if !android		
 		url_loader = new URLLoader();
 		url_loader.dataFormat = URLLoaderDataFormat.TEXT;
 		url_loader.addEventListener(Event.COMPLETE, onDownloadComplete);
@@ -311,65 +445,28 @@ class Main extends Sprite
 		url_loader2 = new URLLoader();
 		url_loader2.dataFormat = URLLoaderDataFormat.TEXT;
 		url_loader2.addEventListener(Event.COMPLETE, onDownloadChangeLogComplete);
+		#end
 		
+		#if windows
 		url_loader3 = new URLLoader();
 		url_loader3.dataFormat = URLLoaderDataFormat.BINARY;
 		url_loader3.addEventListener(ProgressEvent.PROGRESS, onDownloadProgress);
 		url_loader3.addEventListener(Event.COMPLETE, onDownloadSetupComplete);
 		
 		GV.startDownload = startDownload;
+		#end
 		
-		var settings:String = TextFileUtils.readTextFile(Utils.getExecutablePath() + "settings.cfg");
-		
-		if (settings != "")
-		{
-			var array:Array<String> = settings.split("|");
-			
-			if (array.length > 1)
-			{
-				if (array[0] == "0")
-				{
-					GV.sound_on = false;
-				}
-				
-				if (array[1] == "0")
-				{
-					toggleSocialButtons(false);
-				}
-			}
-			
-			if (array.length > 2)
-			{
-				if (array[2] == "")
-				{
-					checkUpdates();
-				}
-				else
-				{
-					check_update_date = Date.fromString(array[2]);
-					
-					if (Date.now().getTime() - check_update_date.getTime() > DateTools.days(7))
-					{
-						checkUpdates();
-					}
-				}
-			}
-			else
-			{
-				checkUpdates();
-			}
-			
-			if (array.length > 3)
-			{
-				if (array[3] == "0")
-				{
-					GV.notifications_on = false;
-				}
-			}
-		}
-		else
+		#if !android
+		if (GV.check_update_date == null || (Date.now().getTime() - GV.check_update_date.getTime() > DateTools.days(7)))
 		{
 			checkUpdates();
+		}
+		#end
+		
+		if (!GV.social_buttons_on)
+		{
+			GV.social_buttons_on = true;
+			toggleSocialButtons(false);
 		}
 		
 		download_dialog = new DownloadDialog();
@@ -379,41 +476,64 @@ class Main extends Sprite
 		progress_bar.y = 480-progress_bar.height;
 		background.addChild(progress_bar);
 		
-		addEventListener(Event.ACTIVATE, onActivate );
-		addEventListener(Event.DEACTIVATE, onDeactivate );
 		stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
-						
-		var first_workout_date:Date = WorkoutData.getFirstWorkoutDate();
+		
+		var first_workout_date:Date = so.WorkoutData.getFirstWorkoutDate();
 		
 		if (first_workout_date == null)
 		{
-			info_panel.show("Hello!");
+			info_panel.show(Localization.get("$HELLO"));
 		}
 		else
 		{
-			info_panel.show("Hello, and welcome back!");
+			info_panel.show(Localization.get("$HELLOANDWELCOMEBACK"));
 		}
 		
 		var tips:Array<String> = new Array();
-		tips.push("Don't forget to warm up!");
-		tips.push("Eat healthy, small and often");
-		tips.push("Avoid sleep deprivation");
-		tips.push("Avoid overtraining");
-		tips.push("Exercise using a good form");
-		tips.push("Drink plenty of water");
-		tips.push("Moderate physical activity is good for health");
-		tips.push("Increase workout intensity gradually");
-		tips.push("Be positive and optimistic");
-		tips.push("Improve your sleep regimen and keep it healthy");
 		
-		info_panel.show("Tip of the Day:\n" + tips[Utils.randInt(0,tips.length-1)]);
+		for (i in 0...10)
+		{
+			tips.push(Localization.get("$TIP"+ Std.string(i+1)));
+		}
+		
+		info_panel.show(Localization.get("$TIPOFTHEDAY") + ":\n" + tips[Utils.randInt(0,tips.length-1)]);
 				
 		GV.showText = info_panel.show;
 		
-		//for (workout_info in WorkoutData.getAllRecords())
+		week_days = new Array();
+		week_days.push(Localization.get("$MONDAY"));
+		week_days.push(Localization.get("$TUESDAY"));
+		week_days.push(Localization.get("$WEDNESDAY"));
+		week_days.push(Localization.get("$THURSDAY"));
+		week_days.push(Localization.get("$FRIDAY"));
+		week_days.push(Localization.get("$SATURDAY"));
+		week_days.push(Localization.get("$SUNDAY"));
+		
+		month_text = new Array();
+		month_text.push(Localization.get("$JANUARY"));
+		month_text.push(Localization.get("$FEBRUARY"));
+		month_text.push(Localization.get("$MARCH"));
+		month_text.push(Localization.get("$APRIL"));
+		month_text.push(Localization.get("$MAY"));
+		month_text.push(Localization.get("$JUNE"));
+		month_text.push(Localization.get("$JULY"));
+		month_text.push(Localization.get("$AUGUST"));
+		month_text.push(Localization.get("$SEPTEMBER"));
+		month_text.push(Localization.get("$OCTOBER"));
+		month_text.push(Localization.get("$NOVEMBER"));
+		month_text.push(Localization.get("$DECEMBER"));
+		
+		if (locale != null)
+		{
+			WorkoutData.saveLanguage(locale);
+		}
+		
+		#if debug		
+		//for (workout_info in so.WorkoutData.getAllRecords())
 		//{
-			//trace("new WorkoutInfo(" + workout_info.date + "," + workout_info.value + ")");
-		//}
+			//trace("new WorkoutInfo(" + workout_info.date + "," + workout_info.exercise_type + "," + workout_info.value + ")");
+		//}		
+		#end
 	}
 	
 	private function onDownloadProgress(e:ProgressEvent):Void 
@@ -421,6 +541,7 @@ class Main extends Sprite
 		progress_bar.setValue(url_loader3.bytesLoaded, url_loader3.bytesTotal);
 	}
 	
+	#if windows
 	private function onDownloadSetupComplete(e:Event):Void 
 	{
 		if (Crc32.make(url_loader3.data) == crc)
@@ -433,32 +554,40 @@ class Main extends Sprite
 		}
 		else
 		{
-			info_panel.show("Download failed, please download manually at https://github.com/as3boyan/EnduranceLogger");
+			info_panel.show(Localization.get("$DOWNLOADFAILED"));
 		}
 	}
+	#end
 	
 	private function onDownloadChangeLogComplete(e:Event):Void 
 	{
+		#if windows
 		download_dialog.setCommitLog(url_loader2.data);
 		download_dialog.show();
+		#elseif flash
+		info_panel.show(Localization.get("$NEWFLASHVERSION"));
+		info_panel.show(url_loader2.data);
+		#end
 	}
 	
 	function checkUpdates() 
 	{		
 		if (url_loader.bytesTotal == -1 || url_loader.bytesLoaded == url_loader.bytesTotal)
 		{			
-			check_update_date = Date.now();
-			saveSettings();
+			GV.check_update_date = Date.now();
+			so.WorkoutData.saveSettings();
 			
 			url_loader.load(new URLRequest(dropbox_url + "EnduranceLoggerCrc.txt"));
 		}
 	}
 	
+	#if windows
 	public function startDownload():Void
 	{
 		progress_bar.visible = true;
 		url_loader3.load(new URLRequest(dropbox_url + "EnduranceLoggerSetup.exe"));
 	}
+	#end
 	
 	private function onDownloadComplete(e:Event):Void 
 	{
@@ -473,12 +602,12 @@ class Main extends Sprite
 			
 			if (build_date.getTime() < date.getTime())
 			{
-				Sys.println("New version of Endurance Logger is available at https://github.com/as3boyan/EnduranceLogger");
+				//Sys.println("New version of Endurance Logger is available at https://github.com/as3boyan/EnduranceLogger");
 				url_loader2.load(new URLRequest(dropbox_url + "changelog.txt"));
 			}
 			else
 			{
-				Sys.println("You have latest version installed");
+				//Sys.println("You have latest version installed");
 			}
 		}
 	}
@@ -487,6 +616,8 @@ class Main extends Sprite
 	{
 		switch (e.keyCode)
 		{
+			#if !mobile
+			
 			case Keyboard.NUMBER_1:
 				if (!input_field.visible)
 				{
@@ -543,18 +674,18 @@ class Main extends Sprite
 				
 				if (GV.sound_on)
 				{
-					info_panel.show("Sound is turned on");
+					info_panel.show(Localization.get("$SOUNDON"));
 				}
 				else
 				{
-					info_panel.show("Sound is turned off");
+					info_panel.show(Localization.get("$SOUNDOFF"));
 				}
 				
-				saveSettings();
+				so.WorkoutData.saveSettings();
 
 			case Keyboard.S:
 				toggleSocialButtons();
-				saveSettings();
+				so.WorkoutData.saveSettings();
 				
 			case Keyboard.U:
 				checkUpdates();
@@ -564,51 +695,47 @@ class Main extends Sprite
 				
 				if (GV.notifications_on)
 				{
-					info_panel.show("Notifications are turned on now");
+					info_panel.show(Localization.get("$NOTIFICATIONSON"));
 				}
 				else
 				{
-					Sys.println("Notifications are turned off now");
+					//Sys.println("Notifications are turned off now");
 				}
 				
-				saveSettings();
+				so.WorkoutData.saveSettings();
+				
+			case Keyboard.E:
+				WorkoutData.exportWorkoutStats();
+				
+			case Keyboard.I:
+				WorkoutData.importWorkoutStats();
+				
+			case Keyboard.G:
+				Lib.getURL(new URLRequest("https://github.com/as3boyan/EnduranceLogger"));
+				
+			case Keyboard.C:
+				info_panel.show(Localization.get("$CREDITS"));
+				
+			case Keyboard.R:
+				WorkoutData.resetLanguage();
+				
+			case Keyboard.H:
+				info_panel.show(Localization.get("$HOTKEYS"), 8000);
+				
+			#else
+			
+			case 10:
+				if (input_field.visible && input_field.mouseEnabled)
+				{
+					input_field.onClick();
+					stage.focus = null;
+				}
+				
+			#end
+			
+			case _:
+				//info_panel.show(Std.string(e.charCode));
 		}
-	}
-	
-	private function saveSettings():Void
-	{
-		var str:String = "";
-		
-		if (GV.sound_on)
-		{
-			str += "1|";
-		}
-		else
-		{
-			str += "0|";
-		}
-		
-		if (GV.social_buttons_on)
-		{
-			str += "1|";
-		}
-		else
-		{
-			str += "0|";
-		}
-		
-		str += check_update_date.toString() + "|";
-		
-		if (GV.notifications_on)
-		{
-			str += "1|";
-		}
-		else
-		{
-			str += "0|";
-		}
-		
-		TextFileUtils.updateTextFile(Utils.getExecutablePath() + "settings.cfg", str);
 	}
 	
 	private function toggleSocialButtons(?animated:Bool = true):Void
@@ -622,16 +749,31 @@ class Main extends Sprite
 		{
 			for (i in 0...time_range_buttons.length)
 			{
-				time_range_buttons[i].setPos(i * 75 + stage.stageWidth - 5 * 75 + 15 - 80 - 52, 20, animated);
+				time_range_buttons[i].setPos(i * 75 + 800 - 5 * 75 + 15 - 80 - 52, 20, animated);
 			}
 		}
 		else
 		{
 			for (i in 0...time_range_buttons.length)
 			{
-				time_range_buttons[i].setPos(i * 75 + stage.stageWidth - 5 * 75 + 15, 20, animated);
+				time_range_buttons[i].setPos(i * 75 + 800 - 5 * 75 + 15, 20, animated);
 			}
 		}
+	}
+	
+	private function formatDate(date1:Date):String
+	{
+		var date:String = date1.toString();
+		
+		switch(GV.time_range)
+		{
+			case 1: date = date.substr(date.indexOf(" ") + 1);
+			case 2: date = week_days[Std.int(WorkoutData.getWeekDay(date1))];
+			case 3: date = month_text[date1.getMonth()] + " " + Std.string(date1.getDate());
+			case 4, 5: date = month_text[date1.getMonth()] + " " + Std.string(date1.getFullYear());
+		}
+		
+		return date;
 	}
 	
 	private function updateData():Void
@@ -658,19 +800,18 @@ class Main extends Sprite
 		switch(GV.time_range)
 		{
 			case 1: 
-				workout_stats_records = WorkoutData.getDayWorkoutStats(date1);
-				previous_stats_records = WorkoutData.getPreviousDaysStats(date1);
+				workout_stats_records = so.WorkoutData.getDayWorkoutStats(date1);
+				previous_stats_records = so.WorkoutData.getPreviousDaysStats(date1);
 			case 2: 
-				workout_stats_records = WorkoutData.getWeekWorkoutStats(date1);
-				previous_stats_records = WorkoutData.getPreviousWeekStats(date1);
+				workout_stats_records = so.WorkoutData.getWeekWorkoutStats(date1);
+				previous_stats_records = so.WorkoutData.getPreviousWeekStats(date1);
 			case 3: 
-				workout_stats_records = WorkoutData.getMonthWorkoutStats(date1);
-				previous_stats_records = WorkoutData.getPreviousMonthStats(date1);
+				workout_stats_records = so.WorkoutData.getMonthWorkoutStats(date1);
+				previous_stats_records = so.WorkoutData.getPreviousMonthStats(date1);
 			case 4: 
-				workout_stats_records = WorkoutData.getYearWorkoutStats(date1);
-				previous_stats_records = WorkoutData.getPreviousYearStats(date1);
-			case 5: workout_stats_records = WorkoutData.getAllTimeStats();
-			case _: trace(GV.time_range);
+				workout_stats_records = so.WorkoutData.getYearWorkoutStats(date1);
+				previous_stats_records = so.WorkoutData.getPreviousYearStats(date1);
+			case 5: workout_stats_records = so.WorkoutData.getAllTimeStats();
 		}
 		
 		var workout_stats_records_array:Array<Array<WorkoutInfo>> = new Array();
@@ -678,14 +819,17 @@ class Main extends Sprite
 		
 		if (previous_stats_records != null && previous_stats_records.length > 0)
 		{
-			for (previous_stats in previous_stats_records) workout_stats_records_array.push(previous_stats);
+			for (previous_stats in previous_stats_records)
+			{
+				workout_stats_records_array.push(previous_stats);
+				
+				//for (workout_stats in previous_stats) trace(workout_stats.date);
+			}
 		}
-		
-		//trace(previous_stats_records);
 		
 		var i:Int = 0;
 		
-		var width_interval:Float = (stage.stageWidth-100) / Math.max(workout_stats_records.length-1, 1);
+		var width_interval:Float = (800-100) / Math.max(workout_stats_records.length-1, 1);
 		
 		getMinMax(workout_stats_records_array);
 		
@@ -712,16 +856,14 @@ class Main extends Sprite
 		{
 			target_coord_x.splice(0, 1);
 			target_coord_y.splice(0, 1);
-		}
+		}	
 		
 		for (workout_stats in workout_stats_records)
 		{
 			var colored_circle:ColoredPoint = colored_points_manager.getNext();
 			colored_circle.setColor(GV.colors[GV.exercise_type-1]);
-			//colored_circle.alpha = 1;
 			
-			var date:String = workout_stats.date;
-			//if (GV.time_range == 1) date = date.substr(date.indexOf(" ")+1);
+			var date:String = formatDate(workout_stats.date);
 			
 			sum += workout_stats.value;
 			
@@ -729,7 +871,6 @@ class Main extends Sprite
 			Actuate.stop(colored_circle);
 			target_coord_x.push(50 + i * width_interval);
 			target_coord_y.push(350 - height_interval * (workout_stats.value-min) / Math.max(max - min, 1));
-			//Actuate.tween(colored_circle, 1, { x:50 + i * width_interval, y:350 - height_interval * (workout_stats.value-min) / Math.max(max - min, 1) } );
 			
 			colored_points.push(colored_circle);
 			
@@ -743,7 +884,6 @@ class Main extends Sprite
 		colored_points_manager2.k = 0;
 		
 		var previous_colored_circle:ColoredPoint = null;
-		//trace(workout_stats_records_array);
 		
 		for (i in 0...previous_layers.length)
 		{
@@ -757,27 +897,27 @@ class Main extends Sprite
 				var index:Int = previous_layers.length - 1 - j;
 				
 				i = 0;
-				width_interval = (stage.stageWidth - 100) / Math.max(previous_stats_records[j].length-1, 1);
+				width_interval = (800 - 100) / Math.max(previous_stats_records[j].length-1, 1);
 				
 				for (workout_stats in previous_stats_records[j])
 				{
 					var colored_circle:ColoredPoint = colored_points_manager2.getNext();
 					colored_circle.setColor(GV.colors[GV.exercise_type-1]);
-					//colored_circle.alpha = 0.3;
 									
-					var date:String = workout_stats.date;
+					var date:String = workout_stats.date.toString();
+					
+					switch (GV.time_range)
+					{
+						case 4, 5: date = formatDate(workout_stats.date);
+					}
+					
 					colored_circle.setText(date, workout_stats.value);
 					Actuate.stop(colored_circle);
+					colored_circle.alpha = 0;
+					Actuate.tween(colored_circle, 1, { alpha:1 } );
 					
-					//Actuate.tween(colored_circle, 1, { x:50 + i * width_interval, y:350 - height_interval * (workout_stats.value-min) / Math.max(max - min, 1) } );
 					colored_circle.x = 50 + i * width_interval;
 					colored_circle.y = 350 - height_interval * (workout_stats.value-min) / Math.max(max - min, 1);
-					
-					//trace(min);
-					//trace((workout_stats.value-min) / Math.max(max - min, 1));
-					
-					//trace(date, workout_stats.value);
-					//trace(colored_circle.x, colored_circle.y);
 					
 					if (i > 0)
 					{
@@ -810,15 +950,15 @@ class Main extends Sprite
 		
 		tf_info.textColor = Utils.adjustBrightness(GV.colors[GV.exercise_type-1], 50);
 		
-		tf_info.text = "You did " + Std.string(sum) + " " + GV.exercise_text[GV.exercise_type-1].toLowerCase();
+		tf_info.text = Localization.get("$YOUDID") + " " + Std.string(sum) + " " + GV.exercise_text[GV.exercise_type-1].toLowerCase();
 		
 		switch (GV.time_range)
 		{
-			case 1: tf_info.appendText(" today");
-			case 2: tf_info.appendText(" in this week");
-			case 3: tf_info.appendText(" in this month");
-			case 4: tf_info.appendText(" in this year");
-			case 5: tf_info.appendText(" during all the time");
+			case 1: tf_info.appendText(" "+Localization.get("$TODAY"));
+			case 2: tf_info.appendText(" "+Localization.get("$INTHISWEEK"));
+			case 3: tf_info.appendText(" "+Localization.get("$INTHISMONTH"));
+			case 4: tf_info.appendText(" "+Localization.get("$INTHISYEAR"));
+			case 5: tf_info.appendText(" "+Localization.get("$DURINGALLTIME"));
 		}
 	}
 	
@@ -847,8 +987,8 @@ class Main extends Sprite
 		
 		if (workout_stats_records.length > 0)
 		{
-			var start_date:String = workout_stats_records[0].date;
-			var end_date:String = workout_stats_records[workout_stats_records.length - 1].date;
+			var start_date:String = formatDate(workout_stats_records[0].date);
+			var end_date:String = formatDate(workout_stats_records[workout_stats_records.length - 1].date);
 			
 			tf_start_date.text = start_date;
 			tf_end_date.text = end_date;
@@ -892,7 +1032,27 @@ class Main extends Sprite
 		for (i in n...colored_points.length)
 		{
 			Actuate.stop(colored_points[i]);
-			var tween = Actuate.tween(colored_points[i], 1, { x:target_coord_x[n], y:target_coord_y[n] } ).ease(Linear.easeNone);
+			
+			//var dist = Utils.getDistance(colored_points[i].x, colored_points[i].y, target_coord_x[n], target_coord_y[n]);
+			//colored_points[i].alpha = 0;
+			//
+			var ease = Linear.easeNone;
+			
+			//if (i == n && n != 0)
+			//{				
+				//var y1:Float = colored_points[n].y;
+				//var y2:Float = target_coord_y[n];
+				
+				//if (y2 - y1 > 10)
+				//{
+					//ease = Bounce.easeOut;
+				//}
+			//}
+			// Math.min(5 / colored_points.length, 1)*3
+			//Math.max(dist/300, 0.5)
+			
+			var tween = Actuate.tween(colored_points[i], 0.5, { x:target_coord_x[n], y:target_coord_y[n]} ).ease(ease);
+			
 			if (i == n) 
 			{
 				tween.onComplete(moveToPoint.bind(n+1));
@@ -933,16 +1093,6 @@ class Main extends Sprite
 		{
 			input_field.hide();
 		}
-	}
-	
-	private function onActivate(e:Event):Void 
-	{
-		WorkoutData.init();
-	}
-	
-	private function onDeactivate(e:Event):Void 
-	{
-		WorkoutData.close();
 	}
 
 	/* SETUP */

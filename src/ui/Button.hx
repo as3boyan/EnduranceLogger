@@ -21,12 +21,15 @@ package ui;
 
 import flash.display.BlendMode;
 import flash.display.Sprite;
+import flash.events.Event;
 import flash.events.MouseEvent;
+import flash.events.TouchEvent;
 import flash.text.AntiAliasType;
 import flash.text.TextField;
 import flash.text.TextFormat;
 import flash.text.TextFormatAlign;
 import motion.Actuate;
+import so.WorkoutData;
 
 class Button extends Sprite
 {
@@ -40,6 +43,7 @@ class Button extends Sprite
 	var pos_x:Float;
 	var pos_y:Float;
 	var selection:Sprite;
+	var text_format:TextFormat;
 	
 	public function new(_parent:Sprite, _x:Float, _y:Float, _text:String, f:Dynamic=null) 
 	{
@@ -48,9 +52,10 @@ class Button extends Sprite
 		background = new Sprite();
 		addChild(background);
 		
-		var text_format:TextFormat = new TextFormat();
+		text_format = new TextFormat();
 		text_format.font = "Arial";
 		text_format.align = TextFormatAlign.CENTER;
+		text_format.size = 18;
 		
 		tf = new TextField();
 		tf.selectable = false;
@@ -72,11 +77,52 @@ class Button extends Sprite
 		addEventListener(MouseEvent.MOUSE_OUT, onMouseOut);
 		addEventListener(MouseEvent.MOUSE_OVER, onMouseOver);
 		
+		#if mobile
+		addEventListener(TouchEvent.TOUCH_OUT, onTouchOut);
+		addEventListener(TouchEvent.TOUCH_OVER, onTouchOver);
+		addEventListener(TouchEvent.TOUCH_TAP, onTap);
+		addEventListener(TouchEvent.TOUCH_END, onTouchEnd);
+		#end
+		
 		setPos(_x, _y);
 				
 		_parent.addChild(this);
 		
 		if (f != null) on_click = f;
+		
+		addEventListener(Event.ADDED_TO_STAGE, onAdded);
+	}
+	
+	private function onAdded(e:Event):Void 
+	{
+		removeEventListener(Event.ADDED_TO_STAGE, onAdded);
+		
+		if (WorkoutData.getLanguage() == "ru-RU" && stage.stageHeight >= 480)
+		{
+			text_format.size = 14;
+			tf.defaultTextFormat = text_format;
+			tf.text = tf.text;
+		}
+	}
+	
+	private function onTouchEnd(e:TouchEvent):Void 
+	{
+		onMouseOut(null);
+	}
+	
+	private function onTap(e:TouchEvent):Void 
+	{
+		onClick(null);
+	}
+	
+	private function onTouchOut(e:TouchEvent):Void 
+	{
+		onMouseOut(null);
+	}
+	
+	private function onTouchOver(e:TouchEvent):Void 
+	{
+		onMouseOver(null);
 	}
 	
 	private function onMouseOut(e:MouseEvent):Void 
@@ -127,6 +173,10 @@ class Button extends Sprite
 	private function onClick(e:MouseEvent):Void 
 	{
 		if (on_click != null) on_click();
+		
+		#if mobile
+		onMouseOut(null);
+		#end
 	}
 	
 	public function setWidth(?_width:Int=150, ?_height:Int=50, ?_color:Int=-1, ?_selection_thickness:Int=1):Void

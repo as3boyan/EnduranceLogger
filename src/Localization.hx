@@ -17,19 +17,44 @@
  * along with Endurance Logger.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package db;
+package ;
+import flash.display.BitmapData;
+import firetongue.Replace;
 
-class WorkoutInfo
+class Localization
 {
-	public var date:Date;
-	public var exercise_type:Int;
-	public var value:Int;
-
-	public function new(_date:Date, _exercise_type:Int, _value:Int) 
+	private static var fire_tongue:firetongue.FireTongue;
+	
+	public static function init():Void
 	{
-		date = _date;
-		exercise_type = _exercise_type;
-		value = _value;
+		fire_tongue = new firetongue.FireTongue();
+		fire_tongue.init("en-US");
 	}
+	
+	public static function selectLocale(locale:String, ?onLoad:Dynamic = null):Void
+	{
+		fire_tongue.init(locale, onLoad);
+	}
+	
+	public static function getLocales():Array<String>
+	{
+		return fire_tongue.locales;
+	}
+	
+	public static function getIcon(locale:String):BitmapData
+	{
+		return fire_tongue.getIcon(locale);
+	}
+	 
+	public static function get(name:String):String
+	{
+		return fire_tongue.get(name);
+	}
+	
+	public static function getAndReplace(name:String, value:String):String
+	{
+		return Replace.flags(fire_tongue.get(name), ["<X>"],[value]);
+	}
+	
 	
 }

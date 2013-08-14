@@ -3,24 +3,38 @@
 	<!-- NMML reference: https://gist.github.com/1763850 -->
 	
 	<!-- metadata, make sure 'package' is at least 3 segments (ie. com.mycompany.myproject) -->
-	<meta title="Endurance Logger" package="EnduranceLogger" version="1.0.0" company="" />
+	<meta title="Endurance Logger" package="com.as3boyan.EnduranceLogger" version="1.0.0" company="AS3Boyan" />
 	
 	<!-- output -->
-	<app main="Main" file="EnduranceLogger" path="bin" />
+	<app main="Main" file="EnduranceLogger" path="bin" preloader="CustomPreloader"/>
 	
-	<window background="#FFFFFF" fps="60" resizable="false" />
+	<window background="#FFFFFF" fps="60"/>
+	<!--<window width="320" height="240" unless="mobile"/> -->
+	<!--<window width="960" height="640" unless="mobile"/> -->
 	<window width="800" height="480" unless="mobile"/>
+	
 	<window orientation="landscape" vsync="false" antialiasing="0" if="cpp"/>
+	
+	<haxedef name="fgl_only" if="flash" />
 	
 	<!-- classpath, haxe libs -->
 	<source path="src" />
 	<haxelib name="openfl" />
 	<haxelib name="actuate" />
+	<haxelib name="firetongue" />
+	<haxelib name="sqlite" if="windows" />
+	<haxelib name="kong.hx" if="flash" />
+	<haxelib name="mochi.hx" if="flash" />
+	<haxelib name="FGL.GameTracker.hx" if="flash" />
+	<haxelib name="Mochibot.hx" if="flash" />
+	
+	<!-- <android target-sdk-version="16" /> -->
 	
 	<!-- assets -->
-	<icon path="assets/openfl.svg" />
+	<icon path="assets/endurancelogger.svg" />
 	<assets path="assets/img" rename="img" />
 	<assets path="assets/sounds" rename="sounds" />
+	<assets path="assets/locales" include="*" />
 	
 	<!-- optimize output -->
 	<haxeflag name="-dce std" if="haxe3" />

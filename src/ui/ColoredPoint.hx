@@ -21,7 +21,9 @@ package ui;
 
 import flash.display.Sprite;
 import flash.events.MouseEvent;
+import flash.events.TouchEvent;
 import flash.text.TextField;
+import motion.Actuate;
 
 class ColoredPoint extends Sprite
 {
@@ -43,15 +45,30 @@ class ColoredPoint extends Sprite
 		
 		addEventListener(MouseEvent.MOUSE_OVER, onMouseOver);
 		addEventListener(MouseEvent.MOUSE_OUT, onMouseOut);
+		
+		#if mobile
+		addEventListener(TouchEvent.TOUCH_OUT, onTouchOut);
+		addEventListener(TouchEvent.TOUCH_OVER, onTouchOver);
+		#end
+	}
+	
+	private function onTouchOut(e:TouchEvent):Void 
+	{
+		onMouseOut(null);
+	}
+	
+	private function onTouchOver(e:TouchEvent):Void 
+	{
+		onMouseOver(null);
 	}
 	
 	private function onMouseOver(e:MouseEvent):Void 
 	{
 		tf.visible = true;
 		
-		if (x + 150 > stage.stageWidth)
+		if (x + 150 > 800)
 		{
-			tf.x = (stage.stageWidth - 150 - x);
+			tf.x = (800 - 150 - x);
 		}
 		else
 		{
@@ -68,11 +85,21 @@ class ColoredPoint extends Sprite
 		}
 		
 		parent.setChildIndex(this, parent.numChildren - 1);
+		
+		Actuate.tween(tf, 1, { alpha:1 } );
 	}
 	
 	private function onMouseOut(e:MouseEvent):Void 
 	{
-		tf.visible = false;
+		//tf.visible = false;
+		
+		var n:Int = 0;
+		
+		#if mobile
+		n = 3;
+		#end
+		
+		Actuate.tween(tf, 5, { alpha:0 } ).autoVisible(true).delay(n);
 	}
 	
 	public function setColor(_color:Int, ?_alpha:Float = 1)

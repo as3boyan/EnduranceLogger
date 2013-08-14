@@ -40,15 +40,6 @@ class SocialButton extends Scalable
 		addEventListener(MouseEvent.CLICK, onClick);
 	}
 	
-	public function setPos(_x:Float, _y:Float) 
-	{
-		x = _x;
-		y = _y;
-		
-		start_x = _x;
-		start_y = _y;
-	}
-	
 	private function onClick(e:MouseEvent):Void 
 	{
 		Lib.getURL(new URLRequest(url));

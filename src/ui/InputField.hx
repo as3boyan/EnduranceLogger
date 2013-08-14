@@ -19,7 +19,6 @@
 
 package ui;
 
-import db.WorkoutData;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
@@ -32,19 +31,26 @@ import motion.Actuate;
 import motion.easing.Elastic;
 import motion.easing.Quad;
 import openfl.Assets;
+import so.WorkoutData;
 
 class InputField extends Sprite
 {
 	var tf:TextField;
 	var input_tf:TextField;
 	var exercise_type:Int;
+	var container:Sprite;
 
 	public function new() 
 	{
 		super();
 		
-		var background:ColoredRect = new ColoredRect(250,150,13493987);
-		addChild(background);
+		container = new Sprite();
+		addChild(container);
+		
+		var background:ColoredRect = new ColoredRect(280, 150, 13493987);
+		background.x = - background.width / 2;
+		background.y = - background.height / 2;
+		container.addChild(background);
 		
 		var text_format2:TextFormat = new TextFormat("Arial");
 		text_format2.align = TextFormatAlign.CENTER;
@@ -54,8 +60,9 @@ class InputField extends Sprite
 		tf.width = width;
 		tf.height = 30;
 		tf.defaultTextFormat = text_format2;
-		tf.y = 10;
-		addChild(tf);
+		tf.x = - background.width / 2;
+		tf.y = 10 - background.height / 2;
+		container.addChild(tf);
 		
 		var text_format:TextFormat = new TextFormat("Arial");
 		text_format.align = TextFormatAlign.LEFT;
@@ -65,25 +72,23 @@ class InputField extends Sprite
 		input_tf.type = TextFieldType.INPUT;
 		input_tf.width = 100;
 		input_tf.height = 30;
-		input_tf.x = (width - input_tf.width) / 2;
-		input_tf.y = 43;
+		input_tf.x = (width - input_tf.width) / 2- background.width / 2;
+		input_tf.y = 43 - background.height / 2;
 		input_tf.defaultTextFormat = text_format;
 		input_tf.text = "0";
 		input_tf.border = true;
 		input_tf.borderColor = 0xDADADA;
 		input_tf.background = true;
 		input_tf.backgroundColor = 0xFFFFFF;
-		addChild(input_tf);
+		container.addChild(input_tf);
 		
-		var ok_button:Button = new Button(this, width / 2, 120, "OK", onClick);
+		var ok_button:Button = new Button(this, width / 2 - background.width/2, 120 - background.height/2, Localization.get("$OK"), onClick);
 		ok_button.setWidth(null, null, 3984056);
-		addChild(ok_button);
+		container.addChild(ok_button);
 		
 		visible = false;
 		
 		addEventListener(Event.ADDED_TO_STAGE, onAdded);
-		
-		alpha = 0;
 	}
 	
 	public function onClick() 
@@ -94,61 +99,67 @@ class InputField extends Sprite
 		{			
 			var prev_exercise_type:Int = GV.exercise_type;
 			GV.exercise_type = exercise_type;
-			WorkoutData.addWorkoutStatsNow(n);
+			so.WorkoutData.addNewRecordNow(n);
 			
 			var prev_time_range:Int = GV.time_range;
 			GV.time_range = 4;
 			
-			var day_record = WorkoutData.getDayRecord();
-			var current_date:Date = WorkoutData.resetTime(Date.now());
+			var current_date:Date = so.WorkoutData.resetTime(Date.now());
 			
-			if (WorkoutData.resetTime(Date.fromString(day_record.date)) != current_date)
+			if (WorkoutData.checkDayCount() > 1)
 			{
-				var workout_info = WorkoutData.getDayWorkoutStats(current_date);
-				var sum:Int = WorkoutData.getWorkoutInfoSum(workout_info);
-				var diff:Int = day_record.record - sum;
+				var day_record = so.WorkoutData.getDayRecord();
 				
-				if (diff > 0)
+				if (day_record.date.getDate() != current_date.getDate() || day_record.date.getMonth() != current_date.getMonth() || day_record.date.getFullYear() != current_date.getFullYear())
 				{
-					GV.showText("Do " + Std.string(diff) + " additional " + GV.exercise_text[GV.exercise_type-1].toLowerCase() + " to break day record(" + Std.string(day_record.record) + " on " +  Std.string(day_record.date) + ")", 10000 );
-				}
-			}
-			else
-			{
-				GV.showText("Congratulations! You have set new daily record for " + GV.exercise_text[GV.exercise_type-1].toLowerCase() + "(" + Std.string(day_record.record)  + ")", 5000);
-				
-				if (GV.sound_on)
-				{
-					var timer:Timer = new Timer(1500);
-					timer.run = function ():Void
+					var workout_info = so.WorkoutData.getDayWorkoutStats(current_date);
+					var sum:Int = so.WorkoutData.getWorkoutInfoSum(workout_info);
+					var diff:Int = day_record.record - sum;
+					
+					if (diff > 0)
 					{
-						Assets.getSound("sounds/newdailyrecord.mp3").play();
-						timer.stop();
+						var date_string:String = Std.string(day_record.date);
+						date_string = date_string.substr(0, date_string.indexOf(" "));
+						
+						GV.showText(Localization.getAndReplace("$DOADDITIONAL", Std.string(diff)) +  " " + GV.exercise_text[GV.exercise_type-1].toLowerCase() + " " + Localization.getAndReplace("$TOBREAKDAYRECORDON", Std.string(day_record.record)) + " " +  date_string + ")", 10000 );
+					}
+				}
+				else
+				{				
+					GV.showText(Localization.get("$NEWDAILYRECORD") + " " + GV.exercise_text[GV.exercise_type-1].toLowerCase() + "(" + Std.string(day_record.record)  + ")", 5000);
+					
+					if (GV.sound_on)
+					{
+						var timer:Timer = new Timer(1500);
+						timer.run = function ():Void
+						{
+							Assets.getSound("sounds/newdailyrecord.mp3").play();
+							timer.stop();
+						}
 					}
 				}
 			}
 			
-			if (WorkoutData.checkMonthCount() > 1)
+			if (so.WorkoutData.checkMonthCount() > 1)
 			{
-				var month_record = WorkoutData.getMonthRecord();
-				var month_date:Date = Date.fromString(month_record.date);
+				var month_record = so.WorkoutData.getMonthRecord();
+				var month_date:Date = month_record.date;
 				
-				if (month_date.getMonth() != current_date.getMonth() && month_date.getFullYear() != current_date.getFullYear())
+				if (month_date.getMonth() != current_date.getMonth() || month_date.getFullYear() != current_date.getFullYear())
 				{
 					var date2:Date = new Date(current_date.getFullYear(), current_date.getMonth(), 1, 0, 0, 0);
-					var date3:Date = DateTools.delta(date2, DateTools.days(DateTools.getMonthDays(date2)));
 					
-					var sum:Int = WorkoutData.getSumBetweenDate(date2, date3);
+					var sum:Int = so.WorkoutData.getWorkoutInfoSum(so.WorkoutData.getMonthStats(date2));
 					var diff:Int = month_record.record - sum;
 					
 					if (diff > 0)
 					{
-						GV.showText("Do" + Std.string(diff) + " additional " + GV.exercise_text[GV.exercise_type-1].toLowerCase() + " to break month record(" + Std.string(month_record.record) + " on " +  DateTools.format(cast(month_record.date, Date), "%Y-%m") + ")", 10000);
+						GV.showText(Localization.getAndReplace("$DOADDITIONAL", Std.string(diff)) +  " " + GV.exercise_text[GV.exercise_type-1].toLowerCase() + " " + Localization.getAndReplace("$TOBREAKMONTHRECORDON", Std.string(month_record.record)) + " " +  DateTools.format(cast(month_record.date, Date), "%Y-%m") + ")", 10000);
 					}
 				}
 				else
 				{
-					GV.showText("Congratulations! You have set new month record for " + GV.exercise_text[GV.exercise_type-1].toLowerCase() + "(" + Std.string(month_record.record)  + ")", 5000);
+					GV.showText(Localization.get("$NEWMONTHRECORD") + " " + GV.exercise_text[GV.exercise_type-1].toLowerCase() + "(" + Std.string(month_record.record)  + ")", 5000);
 					
 					if (GV.sound_on)
 					{
@@ -193,33 +204,31 @@ class InputField extends Sprite
 	{
 		removeEventListener(Event.ADDED_TO_STAGE, onAdded);
 		
-		x = (stage.stageWidth - width) / 2;
-		y = (stage.stageHeight - height) / 2;
+		x = (800) / 2;
+		y = (480) / 2;
+		
+		container.alpha = 0;
+		container.scaleX = 0;
+		container.scaleX = 0;
 	}
 	
 	public function show():Void
-	{		
+	{	
 		if (visible == false || mouseEnabled == false)
 		{
 			Actuate.stop(this);
 		
-			x = -150;
-			Actuate.tween(this, 3, { x:(stage.stageWidth - width) / 2, alpha:1 } );
+			//x = -150;
+			Actuate.tween(container, 0.4, {alpha:1, scaleX:1, scaleY:1 } );
 		}
+		
+		parent.setChildIndex(this, parent.numChildren - 1);
 		
 		var exercise_type_text:String = null;
 		
-		switch (GV.exercise_type)
-		{
-			case 1: exercise_type_text = "pushups";
-			case 2: exercise_type_text = "pullups";
-			case 3: exercise_type_text = "squats";
-			case 4: exercise_type_text = "situps";
-			case 5: exercise_type_text = "dips";
-			case _: trace(GV.exercise_type);
-		}
+		exercise_type_text = GV.exercise_text[GV.exercise_type-1].toLowerCase();
 		
-		tf.text = "How much " + exercise_type_text + " did you made?";
+		tf.text = Localization.getAndReplace("$HOWMUCH", exercise_type_text);
 		visible = true;
 		mouseEnabled = true;
 		mouseChildren = true;
@@ -234,7 +243,9 @@ class InputField extends Sprite
 		mouseEnabled = false;
 		mouseChildren = false;
 		
-		Actuate.tween(this, 3, { alpha:0,x:stage.stageWidth } ).onComplete(setVisibleToFalse);
+		Actuate.tween(container, 0.4, { alpha:0, scaleX:0, scaleY:0} ).onComplete(setVisibleToFalse);
+		
+		stage.focus = null;
 	}
 	
 	function setVisibleToFalse():Void
