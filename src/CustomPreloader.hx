@@ -2,8 +2,7 @@ package ;
 import flash.events.Event;
 
 class CustomPreloader extends NMEPreloader
-{
-
+{	
 	public function new() 
 	{
 		super();

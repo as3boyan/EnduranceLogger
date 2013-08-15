@@ -92,7 +92,7 @@ class InputField extends Sprite
 	}
 	
 	public function onClick() 
-	{
+	{		
 		var n = Std.parseInt(input_tf.text);
 		
 		if (n != null && n>0)
@@ -208,8 +208,8 @@ class InputField extends Sprite
 		y = (480) / 2;
 		
 		container.alpha = 0;
-		container.scaleX = 0;
-		container.scaleX = 0;
+		container.scaleX = 0.1;
+		container.scaleX = 0.1;
 	}
 	
 	public function show():Void
@@ -243,14 +243,9 @@ class InputField extends Sprite
 		mouseEnabled = false;
 		mouseChildren = false;
 		
-		Actuate.tween(container, 0.4, { alpha:0, scaleX:0, scaleY:0} ).onComplete(setVisibleToFalse);
+		Actuate.tween(container, 0.4, { alpha:0, scaleX:0.1, scaleY:0.1 } ).autoVisible(true);
 		
 		stage.focus = null;
-	}
-	
-	function setVisibleToFalse():Void
-	{
-		visible = false;
 	}
 	
 }

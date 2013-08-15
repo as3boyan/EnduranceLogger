@@ -134,6 +134,7 @@ class Main extends Sprite
 		scaleY = stage.stageHeight/480;
 	}
 	
+	#if fgl_only
 	function show_sitelock()
 	{
 		info_panel = new InfoPanel();
@@ -152,6 +153,7 @@ class Main extends Sprite
 		button.setWidth(250, 50);
 		addChild(button);
 	}
+	#end
 	
 	function init() 
 	{
@@ -1098,7 +1100,7 @@ class Main extends Sprite
 	/* SETUP */
 
 	public function new() 
-	{
+	{		
 		super();	
 		addEventListener(Event.ADDED_TO_STAGE, added);
 	}
@@ -1112,13 +1114,5 @@ class Main extends Sprite
 		#else
 		init();
 		#end
-	}
-	
-	public static function main() 
-	{
-		// static entry point
-		Lib.current.stage.align = flash.display.StageAlign.TOP_LEFT;
-		Lib.current.stage.scaleMode = flash.display.StageScaleMode.NO_SCALE;
-		Lib.current.addChild(new Main());
 	}
 }
