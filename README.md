@@ -5,7 +5,7 @@ Program that is intended to help you to track your fitness progress
 
 
 ### Binary
-Endurance Logger 1.0 Alpha(Windows binary + source):
+Endurance Logger 1.0(Windows binary + source):
 https://dl.dropboxusercontent.com/u/107033883/EnduranceLoggerSetup.exe
 
 
