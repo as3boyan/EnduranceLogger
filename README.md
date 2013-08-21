@@ -17,6 +17,9 @@ http://www.kongregate.com/games/as3boyan/endurance-logger
 or MochiMedia:
 http://www.mochimedia.com/games/play/endurance-logger
 
+or on Google Play:
+https://play.google.com/store/apps/details?id=com.as3boyan.EnduranceLogger
+
 ### Build from source
 
 You can build it using FlashDevelop(Neko target).
