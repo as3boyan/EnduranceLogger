@@ -5,8 +5,15 @@ Program that is intended to help you to track your fitness progress
 
 
 ### Binary
-Endurance Logger 1.0(Windows binary + source):
+
+#### Windows
+
+Endurance Logger 1.0(binary + source):
 https://dl.dropboxusercontent.com/u/107033883/EnduranceLoggerSetup.exe
+
+#### Linux
+
+https://dl.dropboxusercontent.com/u/107033883/EnduranceLogger.tar.gz
 
 
 ### Web
